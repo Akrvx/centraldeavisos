@@ -61,6 +61,7 @@
                 <a href="anuncios.html">Anúncios</a>
                 <a href="perfil.html">Meu Perfil</a>
                 <a href="admin-avisos.html" id="admin-link" style="display: none;">Painel de Avisos (Admin)</a>
+                <a href="admin-anuncios.html" id="admin-anuncios-link" style="display: none;">Painel de Anúncios (Admin)</a>
             </nav>
 
         </main>
@@ -98,6 +99,7 @@
             // 2. MOSTRA O LINK DE ADMIN SE A ROLE FOR 'admin'
             if (profile.role === 'admin') {
                 document.getElementById('admin-link').style.display = 'block';
+                document.getElementById('admin-anuncios-link').style.display = 'block';
             }
         }
 

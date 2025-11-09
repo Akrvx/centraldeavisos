@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="style.css">
+    <title>Painel de Anúncios - Admin</title>
+</head>
+<body>
+
+    <div class="container">
+        <header>
+            <h1>Painel de Anúncios (Admin)</h1>
+            
+            <a href="portal-home.html" style="text-decoration: none;">Voltar</a>
+            <div id="header-avatar" class="header-avatar"></div>
+            <button id="btn-logout">Sair (Logout)</button>
+        </header>
+
+        <hr>
+
+        <main>
+            <h2>Postar um Novo Anúncio</h2>
+            
+            <div id="anuncio-error" class="error-message"></div>
+            
+            <div id="form-novo-anuncio">
+                <input type="text" id="anuncio-titulo" placeholder="Título do Anúncio">
+                <textarea id="anuncio-conteudo" placeholder="O que você quer anunciar?"></textarea>
+                <button id="btn-postar-anuncio">Postar Anúncio</button>
+            </div>
+
+            <hr>
+
+            <h2>Anúncios da Turma</h2>
+            <div id="lista-anuncios">
+                <p>Carregando anúncios...</p>
+            </div>
+        </main>
+    </div> <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="app.js"></script>
+
+    <script>
+        // SCRIPT ATUALIZADO
+        async function verificarSessao() {
+            const { data: { session } } = await clienteSupabase.auth.getSession();
+            if (!session) {
+                window.location.href = 'index.html';
+                return;
+            }
+
+            const { data: profile, error } = await clienteSupabase
+                .from('profiles')
+                .select('role, avatar_url')
+                .eq('id', session.user.id)
+                .single();
+            
+            if (error || !profile) {
+                window.location.href = 'index.html';
+                return;
+            }
+
+            if (profile.role !== 'admin') {
+                alert('Acesso negado. Esta é uma área administrativa.');
+                window.location.href = 'portal-home.html';
+                return;
+            }
+
+            console.log('Admin logado:', session.user.email);
+            if (profile.avatar_url) {
+                document.getElementById('header-avatar').style.backgroundImage = `url(${profile.avatar_url})`;
+            }
+            
+            // FUNÇÃO CHAMADA ATUALIZADA
+            carregarAnuncios();
+        }
+
+        document.addEventListener('DOMContentLoaded', () => {
+            verificarSessao();
+
+            document.getElementById('btn-logout').addEventListener('click', () => {
+                logoutUsuario();
+            });
+
+            // IDs E FUNÇÕES ATUALIZADOS
+            const btnPostar = document.getElementById('btn-postar-anuncio');
+            btnPostar.addEventListener('click', () => {
+                criarAnuncio();
+            });
+        });
+    </script>
+</body>
+</html>

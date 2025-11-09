@@ -1,4 +1,4 @@
-// --- app.js (VERSÃO COM CORREÇÃO DE TIMING DO PERFIL) ---
+// --- app.js (VERSÃO COM FUNÇÕES DE 'ANÚNCIOS') ---
 
 // 1. CONEXÃO COM O SUPABASE
 const SUPABASE_URL = 'https://gtcwclhvapajvigacuyp.supabase.co'; 
@@ -149,15 +149,12 @@ async function carregarPerfil() {
         const { data: { user } } = await clienteSupabase.auth.getUser();
         if (!user) throw new Error("Usuário não encontrado.");
 
-        // --- CORREÇÃO AQUI ---
-        // Trocamos .single() por .maybeSingle()
-        // .single() gera um ERRO se não achar nada (o que causa o bug)
-        // .maybeSingle() retorna NULO se não achar nada (o que é perfeito)
+        // 2. Pega os dados da tabela 'profiles'
         const { data: profile, error } = await clienteSupabase
             .from('profiles')
             .select('nome_completo, matricula, curso, avatar_url')
             .eq('id', user.id)
-            .maybeSingle(); // <-- A MUDANÇA ESTÁ AQUI
+            .maybeSingle(); // <-- Correção de timing
 
         // Se houver um erro REAL (ex: sem conexão), nós paramos
         if (error) { throw error; }
@@ -178,7 +175,6 @@ async function carregarPerfil() {
             }
         } else {
             // Se o perfil for nulo (usuário muito novo), apenas mostra os campos vazios
-            // e o placeholder.
             document.getElementById('avatar-preview').style.backgroundImage = `url('https://via.placeholder.com/150')`;
         }
     } catch (error) {
@@ -189,15 +185,12 @@ async function carregarPerfil() {
 
 /**
  * Atualiza os dados (nome, matricula, curso) e/ou a foto de perfil do usuário.
- * @param {object} updates - Objeto com os campos a atualizar (nome_completo, matricula, curso)
- * @param {File} file - O arquivo de imagem (opcional)
  */
 async function atualizarPerfil(updates, file) {
     try {
         hideMessage('perfil-message');
         const { data: { user } } = await clienteSupabase.auth.getUser();
 
-        // 1. Se o usuário enviou um ARQUIVO (foto)
         if (file) {
             const filePath = `${user.id}-${new Date().getTime()}-${file.name}`;
             const { error: uploadError } = await clienteSupabase.storage
@@ -206,28 +199,20 @@ async function atualizarPerfil(updates, file) {
                     cacheControl: '3600',
                     upsert: true 
                 });
-
             if (uploadError) { throw uploadError; }
-
             const { data: { publicUrl } } = clienteSupabase.storage
                 .from('avatars')
                 .getPublicUrl(filePath);
-            
-            // Adiciona a nova URL da foto ao objeto 'updates'
             updates.avatar_url = publicUrl;
         }
         
-        // 2. Atualiza a tabela 'profiles' com todos os dados
         const { error } = await clienteSupabase
             .from('profiles')
-            .update(updates) // 'updates' é {nome_completo, matricula, curso, avatar_url?}
-            .eq('id', user.id); // Onde o 'id' do perfil é o 'id' do usuário
-
+            .update(updates)
+            .eq('id', user.id);
         if (error) { throw error; }
 
-        // Sucesso!
         showMessage('perfil-message', 'Perfil atualizado com sucesso!', false);
-        // Atualiza a imagem de preview na hora, se ela foi mudada
         if (updates.avatar_url) {
             document.getElementById('avatar-preview').style.backgroundImage = `url(${updates.avatar_url})`;
         }
@@ -267,22 +252,96 @@ async function removerAvatar() {
         hideMessage('perfil-message');
         const placeholder = 'https://via.placeholder.com/150';
         const { data: { user } } = await clienteSupabase.auth.getUser();
-
-        // Atualiza a coluna 'avatar_url' na tabela 'profiles' para null
         const { error } = await clienteSupabase
             .from('profiles')
             .update({ avatar_url: null })
-            .eq('id', user.id); // Onde o 'id' do perfil é o 'id' do usuário
-
+            .eq('id', user.id);
         if (error) { throw error; }
-
-        // Atualiza a UI
         document.getElementById('avatar-preview').style.backgroundImage = `url('${placeholder}')`;
         document.getElementById('perfil-avatar').value = null; 
         showMessage('perfil-message', 'Foto de perfil removida!', false);
-
     } catch (error) {
         console.error('Erro ao remover avatar:', error.message);
         showMessage('perfil-message', 'Erro ao remover foto: ' + error.message);
+    }
+}
+
+
+// --- 5. FUNÇÕES DO BANCO DE DADOS (ANÚNCIOS) ---
+// (Copiadas e adaptadas das funções de 'Avisos')
+
+/**
+ * Carrega os anúncios da tabela 'anuncios'.
+ */
+async function carregarAnuncios() {
+    const { data, error } = await clienteSupabase
+        .from('anuncios') // MUDANÇA: de 'avisos' para 'anuncios'
+        .select('*')         
+        .order('created_at', { ascending: false }); 
+
+    if (error) {
+        console.error('Erro ao carregar anúncios:', error.message);
+        // MUDANÇA: 'anuncio-error'
+        showMessage('anuncio-error', 'Erro ao carregar os anúncios. Tente recarregar a página.');
+        return;
+    }
+
+    // MUDANÇA: 'lista-anuncios'
+    const listaAnuncios = document.getElementById('lista-anuncios');
+    listaAnuncios.innerHTML = ''; 
+
+    if (data.length === 0) {
+        listaAnuncios.innerHTML = '<p>Nenhum anúncio postado ainda.</p>';
+        return;
+    }
+
+    data.forEach(anuncio => {
+        const divAnuncio = document.createElement('div');
+        divAnuncio.classList.add('aviso'); // Podemos reutilizar o CSS 'aviso'
+        divAnuncio.innerHTML = `
+            <h3>${anuncio.titulo}</h3>
+            <p>${anuncio.conteudo}</p>
+            <small>Postado em: ${new Date(anuncio.created_at).toLocaleString('pt-BR')}</small>
+        `;
+        listaAnuncios.appendChild(divAnuncio);
+    });
+}
+
+/**
+ * Cria um novo anúncio (somente admin).
+ */
+async function criarAnuncio() {
+    // MUDANÇA: IDs atualizados
+    hideMessage('anuncio-error'); 
+    const titulo = document.getElementById('anuncio-titulo').value;
+    const conteudo = document.getElementById('anuncio-conteudo').value;
+
+    if (!titulo || !conteudo) {
+        showMessage('anuncio-error', 'Por favor, preencha o título e o conteúdo do anúncio.');
+        return;
+    }
+
+    const { data: { user } } = await clienteSupabase.auth.getUser();
+
+    const { data, error } = await clienteSupabase
+        .from('anuncios') // MUDANÇA: de 'avisos' para 'anuncios'
+        .insert([
+            { titulo: titulo, conteudo: conteudo, user_id: user.id } 
+        ]);
+
+    if (error) {
+        console.error('Erro ao criar anúncio:', error.message);
+        showMessage('anuncio-error', 'Erro ao postar anúncio: ' + error.message);
+    } else {
+        console.log('Anúncio criado:', data);
+        showMessage('anuncio-error', 'Anúncio postado com sucesso!', false);
+        
+        document.getElementById('anuncio-titulo').value = '';
+        document.getElementById('anuncio-conteudo').value = '';
+        carregarAnuncios(); // MUDANÇA: chama a si mesmo
+
+        setTimeout(() => {
+            hideMessage('anuncio-error');
+        }, 3000);
     }
 }

@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="style.css">
+    <title>Anúncios - Portal</title>
+</head>
+<body>
+
+    <div class="container">
+        <header>
+            <h1>Anúncios</h1>
+            
+            <a href="portal-home.html" style="text-decoration: none;">Voltar</a>
+            
+            <div id="header-avatar" class="header-avatar"></div>
+
+            <button id="btn-logout">Sair (Logout)</button>
+        </header>
+
+        <hr>
+
+        <main>
+            <h2>Anúncios da Turma</h2>
+            <div id="lista-anuncios">
+                <p>Carregando anúncios...</p>
+            </div>
+        </main>
+    </div> <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="app.js"></script>
+
+    <script>
+        // SCRIPT ATUALIZADO
+        async function verificarSessao() {
+            const { data: { session } } = await clienteSupabase.auth.getSession();
+            if (!session) {
+                window.location.href = 'index.html';
+                return;
+            }
+            
+            console.log('Usuário logado:', session.user.email);
+            const { data: profile } = await clienteSupabase
+                .from('profiles')
+                .select('avatar_url')
+                .eq('id', session.user.id)
+                .maybeSingle();
+
+            if (profile && profile.avatar_url) {
+                document.getElementById('header-avatar').style.backgroundImage = `url(${profile.avatar_url})`;
+            }
+
+            // FUNÇÃO CHAMADA ATUALIZADA
+            carregarAnuncios();
+        }
+
+        document.addEventListener('DOMContentLoaded', () => {
+            verificarSessao();
+            document.getElementById('btn-logout').addEventListener('click', () => {
+                logoutUsuario();
+            });
+        });
+    </script>
+</body>
+</html>
