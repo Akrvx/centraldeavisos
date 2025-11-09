@@ -4,28 +4,35 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Central de Avisos - Login</title>
-    </head>
+    <link rel="stylesheet" href="style.css">
+</head>
 <body>
 
-    <h1>Central de Avisos da Turma</h1>
+    <div class="container">
+        <h1>Central de Avisos da Turma</h1>
 
-    <div id="form-login">
-        <h2>Login</h2>
-        <input type="email" id="login-email" placeholder="Seu e-mail">
-        <input type="password" id="login-senha" placeholder="Sua senha">
-        <button id="btn-login">Entrar</button>
-    </div>
+        <div id="form-login">
+            <h2>Login</h2>
+            
+            <div id="login-error" class="error-message"></div>
+            
+            <input type="email" id="login-email" placeholder="Seu e-mail">
+            <input type="password" id="login-senha" placeholder="Sua senha">
+            <button id="btn-login">Entrar</button>
+        </div>
 
-    <hr>
+        <hr>
 
-    <div id="form-cadastro">
-        <h2>Não tem conta? Cadastre-se</h2>
-        <input type="email" id="cadastro-email" placeholder="Seu e-mail">
-        <input type="password" id="cadastro-senha" placeholder="Crie uma senha">
-        <button id="btn-cadastro">Cadastrar</button>
-    </div>
-
-    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+        <div id="form-cadastro">
+            <h2>Não tem conta? Cadastre-se</h2>
+            
+            <div id="cadastro-error" class="error-message"></div>
+            
+            <input type="email" id="cadastro-email" placeholder="Seu e-mail">
+            <input type="password" id="cadastro-senha" placeholder="Crie uma senha">
+            <button id="btn-cadastro">Cadastrar</button>
+        </div>
+    </div> <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     
     <script src="app.js"></script>
 

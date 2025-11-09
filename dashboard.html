@@ -3,44 +3,48 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="style.css">
     <title>Dashboard - Central de Avisos</title>
 </head>
 <body>
 
-    <header>
-        <h1>Bem-vindo à Central de Avisos</h1>
-        <button id="btn-logout">Sair (Logout)</button>
-    </header>
-
-    <hr>
-
-    <main>
-        <h2>Postar um Novo Aviso</h2>
-        <div id="form-novo-aviso">
-            <input type="text" id="aviso-titulo" placeholder="Título do Aviso">
-            <textarea id="aviso-conteudo" placeholder="O que você quer avisar?"></textarea>
-            <button id="btn-postar-aviso">Postar Aviso</button>
-        </div>
+    <div class="container">
+        <header>
+            <h1>Bem-vindo à Central de Avisos</h1>
+            <button id="btn-logout">Sair (Logout)</button>
+        </header>
 
         <hr>
 
-        <h2>Avisos da Turma</h2>
-        <div id="lista-avisos">
-            <p>Carregando avisos...</p>
-        </div>
-    </main>
+        <main>
+            <h2>Postar um Novo Aviso</h2>
+            
+            <div id="aviso-error" class="error-message"></div>
+            
+            <div id="form-novo-aviso">
+                <input type="text" id="aviso-titulo" placeholder="Título do Aviso">
+                <textarea id="aviso-conteudo" placeholder="O que você quer avisar?"></textarea>
+                <button id="btn-postar-aviso">Postar Aviso</button>
+            </div>
 
-    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+            <hr>
+
+            <h2>Avisos da Turma</h2>
+            <div id="lista-avisos">
+                <p>Carregando avisos...</p>
+            </div>
+        </main>
+    </div> <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     
     <script src="app.js"></script>
 
     <script>
         // Função para verificar se o usuário está logado
-        async function verificarSessao() {
+      async function verificarSessao() {
             const { data: { session } } = await clienteSupabase.auth.getSession();
             if (!session) {
                 // Se NÃO tiver sessão (não está logado), chuta de volta pro index
-                alert('Você precisa estar logado para ver esta página.');
+                // REMOVEMOS O ALERTA. O redirecionamento é o suficiente.
                 window.location.href = 'index.html';
             } else {
                 // Se ESTÁ logado, carrega os avisos
@@ -50,7 +54,6 @@
         }
 
         
-        // --- CORREÇÃO AQUI ---
         // Espera o DOM (a página) estar 100% carregado antes de rodar o código
         document.addEventListener('DOMContentLoaded', () => {
             

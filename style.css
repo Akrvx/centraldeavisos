@@ -1,0 +1,136 @@
+/* --- style.css --- */
+
+/* 1. Reset Básico e Fonte */
+body {
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    background-color: #f4f4f9; /* Um cinza bem claro de fundo */
+    color: #333;
+    margin: 0;
+    padding: 20px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+    box-sizing: border-box;
+}
+
+/* 2. Container Principal (Centraliza tudo) */
+/* Vamos precisar adicionar <div class="container"> no nosso HTML */
+.container {
+    width: 100%;
+    max-width: 600px; /* Limita a largura do conteúdo */
+    background-color: #ffffff;
+    padding: 25px 40px;
+    border-radius: 8px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+}
+
+h1, h2 {
+    text-align: center;
+    color: #222;
+}
+
+/* 3. Estilo dos Formulários (Inputs e Botões) */
+input[type="email"],
+input[type="password"],
+input[type="text"],
+textarea {
+    width: 100%;
+    padding: 12px 15px;
+    margin-bottom: 15px;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+    box-sizing: border-box; /* Garante que o padding não quebre o layout */
+    font-size: 16px;
+}
+
+textarea {
+    min-height: 100px;
+    resize: vertical; /* Permite ao usuário redimensionar a altura */
+}
+
+button {
+    width: 100%;
+    padding: 12px 20px;
+    background-color: #007bff; /* Um azul bonito */
+    color: white;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer; /* Mãozinha ao passar o mouse */
+    font-size: 16px;
+    font-weight: bold;
+    transition: background-color 0.2s; /* Efeito suave */
+}
+
+button:hover {
+    background-color: #0056b3;
+}
+
+hr {
+    border: none;
+    border-top: 1px solid #eee;
+    margin: 30px 0;
+}
+
+/* 4. Estilo do Header do Dashboard */
+header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding-bottom: 10px;
+}
+
+header h1 {
+    text-align: left;
+    margin: 0;
+    font-size: 24px;
+}
+
+/* Botão de logout menor */
+#btn-logout {
+    width: auto; /* Tamanho automático */
+    background-color: #dc3545; /* Vermelho para "sair" */
+}
+
+#btn-logout:hover {
+    background-color: #c82333;
+}
+
+/* 5. Estilo dos Cards de Aviso */
+#lista-avisos {
+    margin-top: 20px;
+}
+
+.aviso {
+    background-color: #f9f9f9;
+    border: 1px solid #eee;
+    border-radius: 5px;
+    padding: 15px 20px;
+    margin-bottom: 15px;
+}
+
+.aviso h3 {
+    margin: 0 0 10px 0;
+    color: #0056b3;
+}
+
+.aviso p {
+    margin: 0 0 10px 0;
+}
+
+.aviso small {
+    color: #777;
+    font-style: italic;
+}
+
+/* 6. (Opcional) Mensagens de Erro */
+.error-message {
+    color: #dc3545; /* Vermelho */
+    background-color: #f8d7da;
+    border: 1px solid #f5c6cb;
+    padding: 10px 15px;
+    border-radius: 5px;
+    margin-bottom: 15px;
+    text-align: center;
+    display: none; /* Escondido por padrão */
+}
