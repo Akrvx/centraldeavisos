@@ -1,4 +1,4 @@
-// --- app.js (VERSÃO ATUALIZADA COM MENSAGENS DE ERRO E ROTA DO PORTAL) ---
+// --- app.js (VERSÃO CORRIGIDA - PERFIL E UPLOAD) ---
 
 // 1. CONEXÃO COM O SUPABASE
 const SUPABASE_URL = 'https://gtcwclhvapajvigacuyp.supabase.co'; 
@@ -24,8 +24,6 @@ function showMessage(elementId, message, isError = true) {
 
     if (!isError) {
         // Remove a classe de erro e adiciona a de sucesso
-        // Precisamos adicionar 'success-message' ao seu style.css se quisermos verde
-        // Por enquanto, vamos apenas mudar a cor com JS:
         div.style.color = '#155724'; // Verde
         div.style.borderColor = '#c3e6cb';
         div.style.backgroundColor = '#d4edda';
@@ -93,7 +91,6 @@ async function loginUsuario(email, senha) {
     } else {
         console.log('Login com sucesso!', data.user);
         
-        // --- MUDANÇA PRINCIPAL AQUI ---
         // Redireciona para a nova home do portal
         window.location.href = 'portal-home.html';
     }
@@ -182,8 +179,12 @@ async function criarAviso() {
             hideMessage('aviso-error');
         }, 3000);
     }
+} // <-- FIM DA FUNÇÃO criarAviso
 
-    /**
+
+// 4. FUNÇÕES DE PERFIL (Corrigidas para ficarem DO LADO DE FORA)
+
+/**
  * Carrega os dados do usuário logado e preenche o formulário de perfil.
  */
 async function carregarPerfil(user) {
@@ -195,12 +196,12 @@ async function carregarPerfil(user) {
         document.getElementById('perfil-email').value = user.email;
         
         // Preenche o nome (se existir)
-        if (metadata.nome_completo) {
+        if (metadata && metadata.nome_completo) {
             document.getElementById('perfil-nome').value = metadata.nome_completo;
         }
         
         // Preenche a imagem de avatar (se existir)
-        if (metadata.avatar_url) {
+        if (metadata && metadata.avatar_url) {
             document.getElementById('avatar-preview').style.backgroundImage = `url(${metadata.avatar_url})`;
         }
     } catch (error) {
@@ -216,17 +217,23 @@ async function atualizarPerfil(nome, file) {
     try {
         hideMessage('perfil-message');
         const { data: { user } } = await clienteSupabase.auth.getUser();
-        let avatar_url = user.user_metadata.avatar_url; // Pega a URL antiga
+        
+        // Pega a URL antiga, ou define como null se não existir
+        let avatar_url = (user.user_metadata && user.user_metadata.avatar_url) ? user.user_metadata.avatar_url : null;
         
         // 1. Se o usuário enviou um ARQUIVO (foto)
         if (file) {
-            // Cria um nome de arquivo único para evitar conflitos
-            const filePath = `public/${user.id}-${new Date().getTime()}-${file.name}`;
+            // --- CORREÇÃO AQUI ---
+            // Remove o 'public/' do caminho do arquivo
+            const filePath = `${user.id}-${new Date().getTime()}-${file.name}`;
             
             // Faz o upload para o bucket 'avatars'
             const { error: uploadError } = await clienteSupabase.storage
                 .from('avatars')
-                .upload(filePath, file);
+                .upload(filePath, file, {
+                    cacheControl: '3600',
+                    upsert: true // Permite sobrescrever se o arquivo já existir (útil)
+                });
 
             if (uploadError) {
                 throw uploadError; // Joga o erro para o 'catch'
@@ -292,6 +299,4 @@ async function atualizarSenha(novaSenha) {
         console.error('Erro ao alterar senha:', error.message);
         showMessage('senha-message', 'Erro ao alterar senha: ' + error.message);
     }
-}
-
 }
