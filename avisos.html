@@ -4,13 +4,16 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" href="style.css">
-    <title>Dashboard - Central de Avisos</title>
+    <title>Avisos - Central de Avisos</title>
 </head>
 <body>
 
     <div class="container">
         <header>
-            <h1>Bem-vindo à Central de Avisos</h1>
+            <h1>Avisos Importantes</h1>
+            
+            <div id="header-avatar" class="header-avatar"></div>
+
             <button id="btn-logout">Sair (Logout)</button>
         </header>
 
@@ -35,44 +38,41 @@
             </div>
         </main>
     </div> <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-    
     <script src="app.js"></script>
 
     <script>
-        // Função para verificar se o usuário está logado
-      async function verificarSessao() {
+        // SCRIPT ATUALIZADO
+        async function verificarSessao() {
             const { data: { session } } = await clienteSupabase.auth.getSession();
             if (!session) {
-                // Se NÃO tiver sessão (não está logado), chuta de volta pro index
-                // REMOVEMOS O ALERTA. O redirecionamento é o suficiente.
                 window.location.href = 'index.html';
             } else {
-                // Se ESTÁ logado, carrega os avisos
                 console.log('Usuário logado:', session.user.email);
-                carregarAvisos(); // Agora 'carregarAvisos' existirá
+                
+                // --- LÓGICA DO AVATAR ADICIONADA ---
+                const metadata = session.user.user_metadata;
+                if (metadata && metadata.avatar_url) {
+                    document.getElementById('header-avatar').style.backgroundImage = `url(${metadata.avatar_url})`;
+                }
+
+                // Carrega os avisos (função original desta página)
+                carregarAvisos();
             }
         }
 
-        
-        // Espera o DOM (a página) estar 100% carregado antes de rodar o código
         document.addEventListener('DOMContentLoaded', () => {
-            
-            // 1. Verifica a sessão assim que a página carrega
             verificarSessao();
 
-            // 2. Adiciona os 'escutadores' de clique
             const btnLogout = document.getElementById('btn-logout');
             btnLogout.addEventListener('click', () => {
-                logoutUsuario(); // Agora 'logoutUsuario' existirá
+                logoutUsuario();
             });
 
             const btnPostar = document.getElementById('btn-postar-aviso');
             btnPostar.addEventListener('click', () => {
-                criarAviso(); // Agora 'criarAviso' existirá
+                criarAviso();
             });
-            
-        }); // Fim do 'DOMContentLoaded'
-
+        });
     </script>
 
 </body>

@@ -5,12 +5,11 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" href="style.css">
     <title>Meu Perfil - Portal do Aluno</title>
-    
     <style>
         .avatar-preview {
             width: 150px;
             height: 150px;
-            border-radius: 50%; /* Deixa redondo */
+            border-radius: 50%;
             background-color: #eee;
             background-size: cover;
             background-position: center;
@@ -23,23 +22,21 @@
             background-color: #f9f9f9;
             padding: 10px;
         }
-
-        /* ESTILO PARA O NOVO BOTÃO */
         .btn-remover {
             background: none;
             border: none;
-            color: #dc3545; /* Vermelho */
+            color: #dc3545;
             text-decoration: underline;
             cursor: pointer;
             padding: 0;
-            margin-top: 5px; /* Espacinho */
-            margin-bottom: 20px; /* Espaço antes do botão salvar */
+            margin-top: 5px;
+            margin-bottom: 20px;
             width: auto;
             text-align: left;
             font-size: 14px;
         }
         .btn-remover:hover {
-            color: #c82333; /* Vermelho mais escuro */
+            color: #c82333;
         }
     </style>
 </head>
@@ -48,7 +45,11 @@
     <div class="container">
         <header>
             <h1>Meu Perfil</h1>
-            <a href="portal-home.html" style="text-decoration: none; margin-left: auto; margin-right: 20px;">Voltar</a>
+            
+            <a href="portal-home.html" style="text-decoration: none;">Voltar</a>
+            
+            <div id="header-avatar" class="header-avatar"></div>
+            
             <button id="btn-logout">Sair (Logout)</button>
         </header>
 
@@ -57,26 +58,18 @@
         <main>
             <h2>Informações do Perfil</h2>
             <div id="perfil-message" class="error-message" style="display: none;"></div>
-            
             <div id="avatar-preview" class="avatar-preview" style="background-image: url('https://via.placeholder.com/150');"></div>
-            
             <form id="form-perfil">
                 <label for="perfil-email">Email (não pode ser alterado)</label>
                 <input type="email" id="perfil-email" disabled>
-                
                 <label for="perfil-nome">Nome Completo</label>
                 <input type="text" id="perfil-nome" placeholder="Digite seu nome">
-                
                 <label for="perfil-avatar">Foto do Perfil (Opcional)</label>
                 <input type="file" id="perfil-avatar" accept="image/*">
-                
                 <button type="button" id="btn-remover-foto" class="btn-remover">Remover foto atual</button>
-                
                 <button type="submit" id="btn-salvar-perfil">Salvar Informações</button>
             </form>
-            
             <hr>
-            
             <h2>Alterar Senha</h2>
             <div id="senha-message" class="error-message" style="display: none;"></div>
             <form id="form-senha">
@@ -84,19 +77,26 @@
                 <input type="password" id="perfil-senha-nova" placeholder="Digite a nova senha (mínimo 6 caracteres)">
                 <button type="submit" id="btn-salvar-senha">Alterar Senha</button>
             </form>
-            
         </main>
     </div> <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script src="app.js"></script>
 
     <script>
-        // Segurança: Verifica se o usuário está logado
+        // SCRIPT ATUALIZADO
         async function verificarSessao() {
             const { data: { session } } = await clienteSupabase.auth.getSession();
             if (!session) {
                 window.location.href = 'index.html';
             } else {
                 console.log('Usuário logado:', session.user.email);
+                
+                // --- LÓGICA DO AVATAR ADICIONADA ---
+                const metadata = session.user.user_metadata;
+                if (metadata && metadata.avatar_url) {
+                    document.getElementById('header-avatar').style.backgroundImage = `url(${metadata.avatar_url})`;
+                }
+
+                // Carrega o perfil (função original desta página)
                 carregarPerfil(session.user);
             }
         }
@@ -104,46 +104,36 @@
         document.addEventListener('DOMContentLoaded', () => {
             verificarSessao();
 
-            // Botão de Logout
             document.getElementById('btn-logout').addEventListener('click', () => {
                 logoutUsuario();
             });
 
-            // Formulário 1: Salvar Perfil (Nome/Foto)
             document.getElementById('form-perfil').addEventListener('submit', async (e) => {
                 e.preventDefault(); 
                 const nome = document.getElementById('perfil-nome').value;
                 const file = document.getElementById('perfil-avatar').files[0];
                 const btn = document.getElementById('btn-salvar-perfil');
-                
                 btn.disabled = true;
                 btn.innerText = 'Salvando...';
-
                 await atualizarPerfil(nome, file); 
-                
                 btn.disabled = false;
                 btn.innerText = 'Salvar Informações';
             });
 
-            // Formulário 2: Salvar Senha
             document.getElementById('form-senha').addEventListener('submit', async (e) => {
                 e.preventDefault();
                 const senhaNova = document.getElementById('perfil-senha-nova').value;
                 const btn = document.getElementById('btn-salvar-senha');
-
                 btn.disabled = true;
                 btn.innerText = 'Salvando...';
-
                 await atualizarSenha(senhaNova);
-                
                 btn.disabled = false;
                 btn.innerText = 'Alterar Senha';
             });
 
-            // LISTENER DO NOVO BOTÃO
             document.getElementById('btn-remover-foto').addEventListener('click', () => {
                 if (confirm('Tem certeza que deseja remover sua foto de perfil?')) {
-                    removerAvatar(); // Chama a nova função do app.js
+                    removerAvatar();
                 }
             });
         });

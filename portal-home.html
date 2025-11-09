@@ -31,8 +31,6 @@
             border-color: #007bff;
             color: #007bff;
         }
-        /* Nova regra para ajustar 5 itens. */
-        /* Em telas largas, força 3 colunas para ficar melhor */
         @media (min-width: 768px) {
             .portal-nav {
                 grid-template-columns: repeat(3, 1fr);
@@ -45,6 +43,9 @@
     <div class="container">
         <header>
             <h1>Portal do Aluno</h1>
+            
+            <div id="header-avatar" class="header-avatar"></div>
+            
             <button id="btn-logout">Sair (Logout)</button>
         </header>
 
@@ -60,29 +61,34 @@
                 <a href="anuncios.html">Anúncios</a>
                 <a href="perfil.html">Meu Perfil</a>
             </nav>
-            </main>
+
+        </main>
     </div> <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script src="app.js"></script>
 
     <script>
-        // 1. Função de verificação (ESSENCIAL)
+        // SCRIPT ATUALIZADO
         async function verificarSessao() {
             const { data: { session } } = await clienteSupabase.auth.getSession();
             if (!session) {
                 window.location.href = 'index.html';
             } else {
                 console.log('Usuário logado:', session.user.email);
+                
+                // --- LÓGICA DO AVATAR ADICIONADA ---
+                const metadata = session.user.user_metadata;
+                if (metadata && metadata.avatar_url) {
+                    document.getElementById('header-avatar').style.backgroundImage = `url(${metadata.avatar_url})`;
+                }
             }
         }
 
-        // 2. Espera a página carregar para rodar o script
         document.addEventListener('DOMContentLoaded', () => {
-            
             verificarSessao();
 
             const btnLogout = document.getElementById('btn-logout');
             btnLogout.addEventListener('click', () => {
-                logoutUsuario(); // Esta função está no app.js
+                logoutUsuario();
             });
         });
     </script>

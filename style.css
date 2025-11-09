@@ -134,3 +134,37 @@ header h1 {
     text-align: center;
     display: none; /* Escondido por padrão */
 }
+
+/* --- ADIÇÃO: Estilos do Avatar no Cabeçalho --- */
+
+.header-avatar {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%; /* Círculo perfeito */
+    background-color: #eee; /* Cor de fundo enquanto carrega */
+    background-size: cover;
+    background-position: center;
+    border: 2px solid #fff;
+    box-shadow: 0 1px 2px rgba(0,0,0,0.1);
+    margin-left: auto; /* Joga ele para a direita */
+    margin-right: 15px; /* Espaço antes do botão Sair */
+}
+
+/* Ajuste no header para o novo avatar */
+header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding-bottom: 10px;
+}
+
+/* Faz o h1 não ocupar todo o espaço */
+header h1 {
+    flex-grow: 0;
+    margin-right: 20px;
+}
+
+/* Faz o botão de voltar (se existir) não ir para a direita */
+header a[href="portal-home.html"] {
+    margin-left: 0;
+}
