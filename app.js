@@ -1,4 +1,4 @@
-// --- app.js (VERSÃO ATUALIZADA COM MENSAGENS DE ERRO) ---
+// --- app.js (VERSÃO ATUALIZADA COM MENSAGENS DE ERRO E ROTA DO PORTAL) ---
 
 // 1. CONEXÃO COM O SUPABASE
 const SUPABASE_URL = 'https://gtcwclhvapajvigacuyp.supabase.co'; 
@@ -92,7 +92,10 @@ async function loginUsuario(email, senha) {
         showMessage('login-error', userMessage);
     } else {
         console.log('Login com sucesso!', data.user);
-        window.location.href = 'dashboard.html';
+        
+        // --- MUDANÇA PRINCIPAL AQUI ---
+        // Redireciona para a nova home do portal
+        window.location.href = 'portal-home.html';
     }
 }
 

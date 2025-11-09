@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="style.css">
+    <title>Portal do Aluno - Home</title>
+    
+    <style>
+        .portal-nav {
+            display: grid;
+            /* Tenta usar 2 colunas, mas vira 1 coluna em telas pequenas */
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px; /* Espaço entre os botões */
+            margin-top: 20px;
+        }
+        .portal-nav a {
+            display: block;
+            padding: 40px 20px;
+            background-color: #f4f4f9;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            text-align: center;
+            text-decoration: none;
+            color: #333;
+            font-size: 18px;
+            font-weight: bold;
+            transition: all 0.2s;
+        }
+        .portal-nav a:hover {
+            background-color: #e9ecef;
+            border-color: #007bff;
+            color: #007bff;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <header>
+            <h1>Portal do Aluno</h1>
+            <button id="btn-logout">Sair (Logout)</button>
+        </header>
+
+        <hr>
+
+        <main>
+            <h2>O que você gostaria de fazer?</h2>
+            
+            <nav class="portal-nav">
+                <a href="avisos.html">Mural de Avisos</a>
+                
+                <a href="#">Minhas Notas</a>
+                <a href="#">Calendário</a>
+                <a href="#">Meu Perfil</a>
+            </nav>
+
+        </main>
+    </div> <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="app.js"></script>
+
+    <script>
+        // Esta página também precisa de segurança e do botão de logout
+        
+        // 1. Função de verificação (ESSENCIAL)
+        // Ela garante que ninguém acesse esta página sem estar logado
+        async function verificarSessao() {
+            const { data: { session } } = await clienteSupabase.auth.getSession();
+            if (!session) {
+                // Se NÃO tiver sessão, chuta de volta pro index
+                window.location.href = 'index.html';
+            } else {
+                // Se ESTÁ logado, exibe o nome (opcional)
+                console.log('Usuário logado:', session.user.email);
+            }
+        }
+
+        // 2. Espera a página carregar para rodar o script
+        document.addEventListener('DOMContentLoaded', () => {
+            
+            // Verifica a sessão assim que a página carrega
+            verificarSessao();
+
+            // Adiciona a função ao botão de logout
+            const btnLogout = document.getElementById('btn-logout');
+            btnLogout.addEventListener('click', () => {
+                logoutUsuario(); // Esta função está no app.js
+            });
+        });
+    </script>
+
+</body>
+</html>
