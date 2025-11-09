@@ -45,11 +45,8 @@
     <div class="container">
         <header>
             <h1>Meu Perfil</h1>
-            
             <a href="portal-home.html" style="text-decoration: none;">Voltar</a>
-            
             <div id="header-avatar" class="header-avatar"></div>
-            
             <button id="btn-logout">Sair (Logout)</button>
         </header>
 
@@ -58,18 +55,31 @@
         <main>
             <h2>Informações do Perfil</h2>
             <div id="perfil-message" class="error-message" style="display: none;"></div>
+            
             <div id="avatar-preview" class="avatar-preview" style="background-image: url('https://via.placeholder.com/150');"></div>
+            
             <form id="form-perfil">
                 <label for="perfil-email">Email (não pode ser alterado)</label>
                 <input type="email" id="perfil-email" disabled>
+                
                 <label for="perfil-nome">Nome Completo</label>
                 <input type="text" id="perfil-nome" placeholder="Digite seu nome">
+
+                <label for="perfil-matricula">Matrícula</label>
+                <input type="text" id="perfil-matricula" placeholder="Digite sua matrícula (ex: 2025001)">
+
+                <label for="perfil-curso">Curso</label>
+                <input type="text" id="perfil-curso" placeholder="Digite seu curso (ex: Engenharia de Software)">
                 <label for="perfil-avatar">Foto do Perfil (Opcional)</label>
                 <input type="file" id="perfil-avatar" accept="image/*">
+                
                 <button type="button" id="btn-remover-foto" class="btn-remover">Remover foto atual</button>
+                
                 <button type="submit" id="btn-salvar-perfil">Salvar Informações</button>
             </form>
+            
             <hr>
+            
             <h2>Alterar Senha</h2>
             <div id="senha-message" class="error-message" style="display: none;"></div>
             <form id="form-senha">
@@ -77,6 +87,7 @@
                 <input type="password" id="perfil-senha-nova" placeholder="Digite a nova senha (mínimo 6 caracteres)">
                 <button type="submit" id="btn-salvar-senha">Alterar Senha</button>
             </form>
+            
         </main>
     </div> <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script src="app.js"></script>
@@ -89,15 +100,9 @@
                 window.location.href = 'index.html';
             } else {
                 console.log('Usuário logado:', session.user.email);
-                
-                // --- LÓGICA DO AVATAR ADICIONADA ---
-                const metadata = session.user.user_metadata;
-                if (metadata && metadata.avatar_url) {
-                    document.getElementById('header-avatar').style.backgroundImage = `url(${metadata.avatar_url})`;
-                }
-
-                // Carrega o perfil (função original desta página)
-                carregarPerfil(session.user);
+                // ESTA FUNÇÃO 'carregarPerfil' AGORA VAI MUDAR
+                // Ela não vai mais usar (session.user), vai buscar no banco
+                carregarPerfil(); 
             }
         }
 
@@ -108,18 +113,35 @@
                 logoutUsuario();
             });
 
+            // Formulário 1: Salvar Perfil (ATUALIZADO)
             document.getElementById('form-perfil').addEventListener('submit', async (e) => {
                 e.preventDefault(); 
+                
+                // Pegando os novos valores
                 const nome = document.getElementById('perfil-nome').value;
+                const matricula = document.getElementById('perfil-matricula').value;
+                const curso = document.getElementById('perfil-curso').value;
                 const file = document.getElementById('perfil-avatar').files[0];
+                
                 const btn = document.getElementById('btn-salvar-perfil');
                 btn.disabled = true;
                 btn.innerText = 'Salvando...';
-                await atualizarPerfil(nome, file); 
+
+                // Criamos um objeto 'updates' para enviar
+                const updates = {
+                    nome_completo: nome,
+                    matricula: matricula,
+                    curso: curso
+                };
+
+                // A função 'atualizarPerfil' agora receberá o objeto e o arquivo
+                await atualizarPerfil(updates, file); 
+                
                 btn.disabled = false;
                 btn.innerText = 'Salvar Informações';
             });
 
+            // Formulário 2: Salvar Senha (não muda)
             document.getElementById('form-senha').addEventListener('submit', async (e) => {
                 e.preventDefault();
                 const senhaNova = document.getElementById('perfil-senha-nova').value;
@@ -131,6 +153,7 @@
                 btn.innerText = 'Alterar Senha';
             });
 
+            // Botão de remover foto (não muda)
             document.getElementById('btn-remover-foto').addEventListener('click', () => {
                 if (confirm('Tem certeza que deseja remover sua foto de perfil?')) {
                     removerAvatar();
