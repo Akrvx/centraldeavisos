@@ -182,4 +182,116 @@ async function criarAviso() {
             hideMessage('aviso-error');
         }, 3000);
     }
+
+    /**
+ * Carrega os dados do usuário logado e preenche o formulário de perfil.
+ */
+async function carregarPerfil(user) {
+    try {
+        // Pega os metadados (nome, avatar_url) do usuário
+        const metadata = user.user_metadata;
+        
+        // Preenche o campo de e-mail (desabilitado)
+        document.getElementById('perfil-email').value = user.email;
+        
+        // Preenche o nome (se existir)
+        if (metadata.nome_completo) {
+            document.getElementById('perfil-nome').value = metadata.nome_completo;
+        }
+        
+        // Preenche a imagem de avatar (se existir)
+        if (metadata.avatar_url) {
+            document.getElementById('avatar-preview').style.backgroundImage = `url(${metadata.avatar_url})`;
+        }
+    } catch (error) {
+        console.error('Erro ao carregar perfil:', error);
+        showMessage('perfil-message', 'Não foi possível carregar suas informações.');
+    }
+}
+
+/**
+ * Atualiza o nome e/ou a foto de perfil do usuário.
+ */
+async function atualizarPerfil(nome, file) {
+    try {
+        hideMessage('perfil-message');
+        const { data: { user } } = await clienteSupabase.auth.getUser();
+        let avatar_url = user.user_metadata.avatar_url; // Pega a URL antiga
+        
+        // 1. Se o usuário enviou um ARQUIVO (foto)
+        if (file) {
+            // Cria um nome de arquivo único para evitar conflitos
+            const filePath = `public/${user.id}-${new Date().getTime()}-${file.name}`;
+            
+            // Faz o upload para o bucket 'avatars'
+            const { error: uploadError } = await clienteSupabase.storage
+                .from('avatars')
+                .upload(filePath, file);
+
+            if (uploadError) {
+                throw uploadError; // Joga o erro para o 'catch'
+            }
+            
+            // Pega a URL pública do arquivo que acabamos de enviar
+            const { data: { publicUrl } } = clienteSupabase.storage
+                .from('avatars')
+                .getPublicUrl(filePath);
+            
+            avatar_url = publicUrl; // Atualiza a variável da URL do avatar
+        }
+        
+        // 2. Atualiza os metadados do usuário (Auth)
+        const { data, error: updateError } = await clienteSupabase.auth.updateUser({
+            data: { 
+                nome_completo: nome,
+                avatar_url: avatar_url 
+            }
+        });
+
+        if (updateError) {
+            throw updateError;
+        }
+
+        // Sucesso!
+        showMessage('perfil-message', 'Perfil atualizado com sucesso!', false);
+        // Atualiza a imagem de preview na hora
+        if (avatar_url) {
+            document.getElementById('avatar-preview').style.backgroundImage = `url(${avatar_url})`;
+        }
+
+    } catch (error) {
+        console.error('Erro ao atualizar perfil:', error.message);
+        showMessage('perfil-message', 'Erro ao atualizar: ' + error.message);
+    }
+}
+
+/**
+ * Atualiza a senha do usuário logado.
+ */
+async function atualizarSenha(novaSenha) {
+    try {
+        hideMessage('senha-message');
+        
+        if (novaSenha.length < 6) {
+            showMessage('senha-message', 'A senha deve ter no mínimo 6 caracteres.');
+            return;
+        }
+
+        const { data, error } = await clienteSupabase.auth.updateUser({
+            password: novaSenha
+        });
+
+        if (error) {
+            throw error;
+        }
+
+        showMessage('senha-message', 'Senha alterada com sucesso!', false);
+        document.getElementById('perfil-senha-nova').value = ''; // Limpa o campo
+
+    } catch (error) {
+        console.error('Erro ao alterar senha:', error.message);
+        showMessage('senha-message', 'Erro ao alterar senha: ' + error.message);
+    }
+}
+
 }

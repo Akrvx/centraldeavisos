@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="style.css">
+    <title>Meu Perfil - Portal do Aluno</title>
+    <style>
+        /* Estilos extras para o avatar */
+        .avatar-preview {
+            width: 150px;
+            height: 150px;
+            border-radius: 50%; /* Deixa redondo */
+            background-color: #eee;
+            background-size: cover;
+            background-position: center;
+            margin: 0 auto 20px auto;
+            border: 4px solid #fff;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        input[type="file"] {
+            border: none;
+            background-color: #f9f9f9;
+            padding: 10px;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <header>
+            <h1>Meu Perfil</h1>
+            <a href="portal-home.html" style="text-decoration: none; margin-left: auto; margin-right: 20px;">Voltar</a>
+            <button id="btn-logout">Sair (Logout)</button>
+        </header>
+
+        <hr>
+
+        <main>
+            <h2>Informações do Perfil</h2>
+            <div id="perfil-message" class="error-message" style="display: none;"></div>
+            
+            <div id="avatar-preview" style="background-image: url('https://via.placeholder.com/150');"></div>
+            
+            <form id="form-perfil">
+                <label for="perfil-email">Email (não pode ser alterado)</label>
+                <input type="email" id="perfil-email" disabled>
+                
+                <label for="perfil-nome">Nome Completo</label>
+                <input type="text" id="perfil-nome" placeholder="Digite seu nome">
+                
+                <label for="perfil-avatar">Foto do Perfil (Opcional)</label>
+                <input type="file" id="perfil-avatar" accept="image/*">
+                
+                <button type="submit" id="btn-salvar-perfil">Salvar Informações</button>
+            </form>
+            
+            <hr>
+            
+            <h2>Alterar Senha</h2>
+            <div id="senha-message" class="error-message" style="display: none;"></div>
+            <form id="form-senha">
+                <label for="perfil-senha-nova">Nova Senha</label>
+                <input type="password" id="perfil-senha-nova" placeholder="Digite a nova senha (mínimo 6 caracteres)">
+                <button type="submit" id="btn-salvar-senha">Alterar Senha</button>
+            </form>
+            
+        </main>
+    </div> <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="app.js"></script>
+
+    <script>
+        // Segurança: Verifica se o usuário está logado
+        async function verificarSessao() {
+            const { data: { session } } = await clienteSupabase.auth.getSession();
+            if (!session) {
+                window.location.href = 'index.html';
+            } else {
+                console.log('Usuário logado:', session.user.email);
+                // Se logado, carrega as informações do perfil
+                carregarPerfil(session.user);
+            }
+        }
+
+        document.addEventListener('DOMContentLoaded', () => {
+            verificarSessao();
+
+            // Botão de Logout
+            document.getElementById('btn-logout').addEventListener('click', () => {
+                logoutUsuario();
+            });
+
+            // Formulário 1: Salvar Perfil (Nome/Foto)
+            document.getElementById('form-perfil').addEventListener('submit', async (e) => {
+                e.preventDefault(); // Impede o envio do formulário
+                const nome = document.getElementById('perfil-nome').value;
+                const file = document.getElementById('perfil-avatar').files[0];
+                const btn = document.getElementById('btn-salvar-perfil');
+                
+                btn.disabled = true;
+                btn.innerText = 'Salvando...';
+
+                await atualizarPerfil(nome, file); // Chama a função do app.js
+                
+                btn.disabled = false;
+                btn.innerText = 'Salvar Informações';
+            });
+
+            // Formulário 2: Salvar Senha
+            document.getElementById('form-senha').addEventListener('submit', async (e) => {
+                e.preventDefault();
+                const senhaNova = document.getElementById('perfil-senha-nova').value;
+                const btn = document.getElementById('btn-salvar-senha');
+
+                btn.disabled = true;
+                btn.innerText = 'Salvando...';
+
+                await atualizarSenha(senhaNova); // Chama a função do app.js
+                
+                btn.disabled = false;
+                btn.innerText = 'Alterar Senha';
+            });
+        });
+    </script>
+</body>
+</html>
