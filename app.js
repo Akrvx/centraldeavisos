@@ -1,7 +1,7 @@
-// --- app.js (VERSÃO REATORADA COM TABELA 'PROFILES') ---
+// --- app.js (VERSÃO REATORADA COM TABELA 'PROFILES' E URL CORRIGIDA) ---
 
 // 1. CONEXÃO COM O SUPABASE
-const SUPABASE_URL = 'https.supabase.co'; 
+const SUPABASE_URL = 'https://gtcwclhvapajvigacuyp.supabase.co'; // <-- CORRIGIDO AQUI
 const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imd0Y3djbGh2YXBhanZpZ2FjdXlwIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjI3MDc3NDcsImV4cCI6MjA3ODI4Mzc0N30.gEpyYD2LjNzS5rhm4jTSnRtGsjc0ceb6Zzv8MywOWwg';
 
 const { createClient } = supabase;
