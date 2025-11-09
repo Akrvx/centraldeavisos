@@ -1,0 +1,150 @@
+/* --- style.css (VERSÃO PORTAL MACKENZIE) --- */
+/* (Substitua todo o seu CSS por este) */
+
+/* --- 1. Estilos Globais e Fundo --- */
+html, body {
+    height: 100%;
+    margin: 0;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+}
+
+.login-body {
+    /* * IMAGEM DE FUNDO 
+     * Troque esta URL pela imagem que você quiser. 
+     * A da sua referência é: https://www.mackenzie.br/fileadmin/Graduacao/template-2023/assets/img/01-background.jpg
+     */
+    background-image: url('https://upload.wikimedia.org/wikipedia/commons/thumb/9/98/Vale_do_Cafe%2C_RJ_07.jpg/1200px-Vale_do_Cafe%2C_RJ_07.jpg');
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+    
+    /* Centraliza o conteúdo */
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 20px;
+    box-sizing: border-box;
+}
+
+/* Wrapper para os formulários de login e cadastro */
+.login-wrapper {
+    width: 100%;
+    max-width: 400px;
+}
+
+/* --- 2. Caixa de Login Principal --- */
+.login-container {
+    background: rgba(120, 0, 0, 0.7); /* Vermelho escuro, semi-transparente */
+    border-radius: 10px;
+    padding: 2.5rem 2rem;
+    color: white;
+    backdrop-filter: blur(5px); /* Efeito de desfoque no fundo */
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+}
+
+/* Caixa de cadastro (segunda caixa) */
+#form-cadastro {
+    margin-top: 20px;
+    background: rgba(50, 50, 50, 0.7); /* Fundo um pouco mais escuro/neutro */
+}
+
+.login-logo {
+    text-align: center;
+    margin-top: 0;
+    margin-bottom: 2rem;
+    font-weight: 300;
+    letter-spacing: 1px;
+}
+
+h2 {
+    text-align: center;
+    margin-top: 0;
+}
+
+/* --- 3. Campos de Input com Ícones --- */
+.input-group {
+    position: relative;
+    margin-bottom: 1.5rem;
+}
+
+.input-group i {
+    position: absolute;
+    left: 15px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: #aaa; /* Ícone um pouco mais escuro */
+    font-size: 14px;
+}
+
+.input-group input {
+    width: 100%;
+    padding: 14px 15px 14px 45px; /* Espaço para o ícone à esquerda */
+    border: none;
+    border-radius: 5px;
+    background: rgba(255, 255, 255, 1); /* Fundo branco sólido */
+    color: #333;
+    font-size: 16px;
+    box-sizing: border-box;
+}
+
+.input-group input:focus {
+    outline: 2px solid #ff9999;
+}
+
+/* --- 4. Botões e Links --- */
+.btn-login-acessar {
+    width: 100%;
+    padding: 14px;
+    border: none;
+    border-radius: 5px;
+    background-color: #d10000; /* Vermelho vivo (como na imagem) */
+    color: white;
+    font-weight: bold;
+    font-size: 16px;
+    cursor: pointer;
+    transition: background-color 0.2s;
+}
+
+.btn-login-acessar:hover {
+    background-color: #a10000;
+}
+
+/* Links abaixo do botão */
+.login-links {
+    text-align: center;
+    margin-top: 1.5rem;
+}
+
+.login-links a {
+    color: #eee;
+    text-decoration: none;
+    font-size: 14px;
+    display: block;
+    margin-top: 10px;
+}
+
+.login-links a:hover {
+    text-decoration: underline;
+}
+
+/* --- 5. Mensagens de Erro (do seu app.js) --- */
+.error-message {
+    color: #ffffff; 
+    background-color: #ff4d4d;
+    border: 1px solid #ff0000;
+    padding: 10px 15px;
+    border-radius: 5px;
+    margin-bottom: 15px;
+    text-align: center;
+    font-size: 14px;
+    font-weight: bold;
+    display: none; /* Escondido por padrão */
+}
+
+/* Estilo para a mensagem de sucesso (verde) */
+.success-message {
+    /* (O seu app.js já define isso, mas é bom ter no CSS) */
+    color: #155724;
+    background-color: #d4edda;
+    border-color: #c3e6cb;
+}

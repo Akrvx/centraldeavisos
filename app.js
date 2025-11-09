@@ -1,4 +1,4 @@
-// --- app.js (VERSÃO COM FUNÇÕES DE 'ANÚNCIOS') ---
+// --- app.js (VERSÃO COM FUNÇÕES DE 'AVALIAÇÕES') ---
 
 // 1. CONEXÃO COM O SUPABASE
 const SUPABASE_URL = 'https://gtcwclhvapajvigacuyp.supabase.co'; 
@@ -82,9 +82,10 @@ async function logoutUsuario() {
 
 // 3. FUNÇÕES DO BANCO DE DADOS (AVISOS)
 async function carregarAvisos() {
+    const isAdmin = document.getElementById('btn-postar-aviso') !== null;
     const { data, error } = await clienteSupabase
         .from('avisos')      
-        .select('*')         
+        .select('*')       
         .order('created_at', { ascending: false }); 
     if (error) {
         console.error('Erro ao carregar avisos:', error.message);
@@ -100,7 +101,12 @@ async function carregarAvisos() {
     data.forEach(aviso => {
         const divAviso = document.createElement('div');
         divAviso.classList.add('aviso'); 
+        let deleteButtonHTML = '';
+        if (isAdmin) {
+            deleteButtonHTML = `<button class="btn-delete" onclick="deletarAviso(${aviso.id})">Deletar</button>`;
+        }
         divAviso.innerHTML = `
+            ${deleteButtonHTML}
             <h3>${aviso.titulo}</h3>
             <p>${aviso.conteudo}</p>
             <small>Postado em: ${new Date(aviso.created_at).toLocaleString('pt-BR')}</small>
@@ -138,43 +144,28 @@ async function criarAviso() {
     }
 }
 
-// --- 4. FUNÇÕES DE PERFIL (COM A CORREÇÃO DE TIMING) ---
-
-/**
- * Carrega os dados do usuário logado da tabela 'profiles' e preenche o formulário.
- */
+// 4. FUNÇÕES DE PERFIL
 async function carregarPerfil() {
     try {
-        // 1. Pega o usuário logado (da Auth)
         const { data: { user } } = await clienteSupabase.auth.getUser();
         if (!user) throw new Error("Usuário não encontrado.");
-
-        // 2. Pega os dados da tabela 'profiles'
         const { data: profile, error } = await clienteSupabase
             .from('profiles')
             .select('nome_completo, matricula, curso, avatar_url')
             .eq('id', user.id)
-            .maybeSingle(); // <-- Correção de timing
-
-        // Se houver um erro REAL (ex: sem conexão), nós paramos
+            .maybeSingle(); 
         if (error) { throw error; }
-
-        // 3. Preenche o formulário
         document.getElementById('perfil-email').value = user.email;
-        
-        // Se o perfil foi encontrado (NÃO é nulo), preenche os campos
         if (profile) {
             document.getElementById('perfil-nome').value = profile.nome_completo || '';
             document.getElementById('perfil-matricula').value = profile.matricula || '';
             document.getElementById('perfil-curso').value = profile.curso || '';
-            
             if (profile.avatar_url) {
                 document.getElementById('avatar-preview').style.backgroundImage = `url(${profile.avatar_url})`;
             } else {
                 document.getElementById('avatar-preview').style.backgroundImage = `url('https://via.placeholder.com/150')`;
             }
         } else {
-            // Se o perfil for nulo (usuário muito novo), apenas mostra os campos vazios
             document.getElementById('avatar-preview').style.backgroundImage = `url('https://via.placeholder.com/150')`;
         }
     } catch (error) {
@@ -183,14 +174,10 @@ async function carregarPerfil() {
     }
 }
 
-/**
- * Atualiza os dados (nome, matricula, curso) e/ou a foto de perfil do usuário.
- */
 async function atualizarPerfil(updates, file) {
     try {
         hideMessage('perfil-message');
         const { data: { user } } = await clienteSupabase.auth.getUser();
-
         if (file) {
             const filePath = `${user.id}-${new Date().getTime()}-${file.name}`;
             const { error: uploadError } = await clienteSupabase.storage
@@ -205,13 +192,11 @@ async function atualizarPerfil(updates, file) {
                 .getPublicUrl(filePath);
             updates.avatar_url = publicUrl;
         }
-        
         const { error } = await clienteSupabase
             .from('profiles')
             .update(updates)
             .eq('id', user.id);
         if (error) { throw error; }
-
         showMessage('perfil-message', 'Perfil atualizado com sucesso!', false);
         if (updates.avatar_url) {
             document.getElementById('avatar-preview').style.backgroundImage = `url(${updates.avatar_url})`;
@@ -222,9 +207,6 @@ async function atualizarPerfil(updates, file) {
     }
 }
 
-/**
- * Atualiza a senha do usuário logado (Não muda, pois lida só com Auth).
- */
 async function atualizarSenha(novaSenha) {
     try {
         hideMessage('senha-message');
@@ -244,9 +226,6 @@ async function atualizarSenha(novaSenha) {
     }
 }
 
-/**
- * Remove a foto de perfil do usuário da tabela 'profiles'.
- */
 async function removerAvatar() {
     try {
         hideMessage('perfil-message');
@@ -268,37 +247,32 @@ async function removerAvatar() {
 
 
 // --- 5. FUNÇÕES DO BANCO DE DADOS (ANÚNCIOS) ---
-// (Copiadas e adaptadas das funções de 'Avisos')
-
-/**
- * Carrega os anúncios da tabela 'anuncios'.
- */
 async function carregarAnuncios() {
+    const isAdmin = document.getElementById('btn-postar-anuncio') !== null;
     const { data, error } = await clienteSupabase
-        .from('anuncios') // MUDANÇA: de 'avisos' para 'anuncios'
-        .select('*')         
+        .from('anuncios')
+        .select('*')
         .order('created_at', { ascending: false }); 
-
     if (error) {
         console.error('Erro ao carregar anúncios:', error.message);
-        // MUDANÇA: 'anuncio-error'
         showMessage('anuncio-error', 'Erro ao carregar os anúncios. Tente recarregar a página.');
         return;
     }
-
-    // MUDANÇA: 'lista-anuncios'
     const listaAnuncios = document.getElementById('lista-anuncios');
     listaAnuncios.innerHTML = ''; 
-
     if (data.length === 0) {
         listaAnuncios.innerHTML = '<p>Nenhum anúncio postado ainda.</p>';
         return;
     }
-
     data.forEach(anuncio => {
         const divAnuncio = document.createElement('div');
-        divAnuncio.classList.add('aviso'); // Podemos reutilizar o CSS 'aviso'
+        divAnuncio.classList.add('aviso');
+        let deleteButtonHTML = '';
+        if (isAdmin) {
+            deleteButtonHTML = `<button class="btn-delete" onclick="deletarAnuncio(${anuncio.id})">Deletar</button>`;
+        }
         divAnuncio.innerHTML = `
+            ${deleteButtonHTML}
             <h3>${anuncio.titulo}</h3>
             <p>${anuncio.conteudo}</p>
             <small>Postado em: ${new Date(anuncio.created_at).toLocaleString('pt-BR')}</small>
@@ -307,41 +281,149 @@ async function carregarAnuncios() {
     });
 }
 
-/**
- * Cria um novo anúncio (somente admin).
- */
 async function criarAnuncio() {
-    // MUDANÇA: IDs atualizados
     hideMessage('anuncio-error'); 
     const titulo = document.getElementById('anuncio-titulo').value;
     const conteudo = document.getElementById('anuncio-conteudo').value;
-
     if (!titulo || !conteudo) {
         showMessage('anuncio-error', 'Por favor, preencha o título e o conteúdo do anúncio.');
         return;
     }
-
     const { data: { user } } = await clienteSupabase.auth.getUser();
-
     const { data, error } = await clienteSupabase
-        .from('anuncios') // MUDANÇA: de 'avisos' para 'anuncios'
+        .from('anuncios')
         .insert([
             { titulo: titulo, conteudo: conteudo, user_id: user.id } 
         ]);
-
     if (error) {
         console.error('Erro ao criar anúncio:', error.message);
         showMessage('anuncio-error', 'Erro ao postar anúncio: ' + error.message);
     } else {
         console.log('Anúncio criado:', data);
         showMessage('anuncio-error', 'Anúncio postado com sucesso!', false);
-        
         document.getElementById('anuncio-titulo').value = '';
         document.getElementById('anuncio-conteudo').value = '';
-        carregarAnuncios(); // MUDANÇA: chama a si mesmo
-
+        carregarAnuncios();
         setTimeout(() => {
             hideMessage('anuncio-error');
         }, 3000);
+    }
+}
+
+// --- 6. FUNÇÕES DO BANCO DE DADOS (FERIADOS) ---
+async function carregarFeriados() {
+    const { data, error } = await clienteSupabase
+        .from('feriados') 
+        .select('*') // MUDANÇA: Pega o ID para o delete
+        .order('data_feriado', { ascending: true }); 
+    if (error) {
+        console.error('Erro ao carregar feriados:', error.message);
+        showMessage('feriado-error', 'Erro ao carregar os feriados. Tente recarregar a página.');
+        return;
+    }
+    
+    // --- MUDANÇA AQUI ---
+    // Verifica se estamos na página de admin (procurando o botão de postar)
+    const isAdmin = document.getElementById('btn-postar-feriado') !== null;
+    const listaFeriados = document.getElementById('lista-feriados');
+    listaFeriados.innerHTML = ''; 
+
+    if (data.length === 0) {
+        listaFeriados.innerHTML = '<p>Nenhum feriado cadastrado ainda.</p>';
+        return;
+    }
+    data.forEach(feriado => {
+        const divFeriado = document.createElement('div');
+        divFeriado.classList.add('aviso');
+        
+        // --- MUDANÇA AQUI ---
+        // Cria o botão de deletar (se for admin)
+        let deleteButtonHTML = '';
+        if (isAdmin) {
+            deleteButtonHTML = `<button class="btn-delete" onclick="deletarFeriado(${feriado.id})">Deletar</button>`;
+        }
+
+        const dataFormatada = new Date(feriado.data_feriado).toLocaleDateString('pt-BR', {
+            day: '2-digit',
+            month: '2-digit',
+            year: 'numeric',
+            timeZone: 'UTC' 
+        });
+        divFeriado.innerHTML = `
+            ${deleteButtonHTML} <h3>${feriado.titulo}</h3>
+            <p>Data: ${dataFormatada}</p> 
+        `;
+        listaFeriados.appendChild(divFeriado);
+    });
+}
+
+async function criarFeriado() {
+    hideMessage('feriado-error'); 
+    const titulo = document.getElementById('feriado-titulo').value;
+    const dataFeriado = document.getElementById('feriado-data').value;
+    if (!titulo || !dataFeriado) {
+        showMessage('feriado-error', 'Por favor, preencha o nome e a data do feriado.');
+        return;
+    }
+    const { data: { user } } = await clienteSupabase.auth.getUser();
+    const { data, error } = await clienteSupabase
+        .from('feriados')
+        .insert([
+            { titulo: titulo, data_feriado: dataFeriado, user_id: user.id } 
+        ]);
+    if (error) {
+        console.error('Erro ao criar feriado:', error.message);
+        showMessage('feriado-error', 'Erro ao postar feriado: ' + error.message);
+    } else {
+        console.log('Feriado criado:', data);
+        showMessage('feriado-error', 'Feriado postado com sucesso!', false);
+        document.getElementById('feriado-titulo').value = '';
+        document.getElementById('feriado-data').value = '';
+        carregarFeriados();
+        setTimeout(() => {
+            hideMessage('feriado-error');
+        }, 3000);
+    }
+}
+
+
+// --- 7. FUNÇÕES DE DELETAR (ADMIN) ---
+async function deletarAviso(id) {
+    if (!confirm('Tem certeza que deseja deletar este aviso? Esta ação não pode ser desfeita.')) {
+        return;
+    }
+    try {
+        const { error } = await clienteSupabase
+            .from('avisos')
+            .delete()
+            .eq('id', id);
+        if (error) {
+            throw error;
+        }
+        carregarAvisos();
+    } catch (error) {
+        console.error('Erro ao deletar aviso:', error.message);
+        showMessage('aviso-error', 'Erro ao deletar: ' + error.message);
+    }
+}
+
+async function deletarAnuncio(id) {
+    if (!confirm('Tem certeza que deseja deletar este anúncio? Esta ação não pode ser desfeita.')) {
+        return;
+    }
+    try {
+        const { error } = await clienteSupabase
+            .from('anuncios')
+            .delete()
+            .eq('id', id);
+        if (error) {
+            throw error;
+        }
+        // --- CORREÇÃO AQUI ---
+        // Deve chamar carregarAnuncios() e não carregarAvisos()
+        carregarAnuncios();
+    } catch (error) {
+        console.error('Erro ao deletar anúncio:', error.message);
+        showMessage('anuncio-error', 'Erro ao deletar: ' + error.message);
     }
 }

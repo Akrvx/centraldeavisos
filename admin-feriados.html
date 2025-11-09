@@ -4,102 +4,94 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" href="style.css">
-    <title>Painel de Avisos - Admin</title>
+    <title>Painel de Feriados - Admin</title>
 </head>
 <body>
 
     <div class="container">
         <header>
-            <h1>Painel de Avisos</h1>
-
-            <a href="admin-panel.html" style="text-decoration: none;">Voltar ao Painel</a>
+            <h1>Painel de Feriados</h1>
             
+            <a href="admin-panel.html" style="text-decoration: none;">Voltar ao Painel</a>
             <div id="header-avatar" class="header-avatar"></div>
-
             <button id="btn-logout">Sair (Logout)</button>
         </header>
 
         <hr>
 
         <main>
-            <h2>Postar um Novo Aviso</h2>
+            <h2>Postar um Novo Feriado</h2>
             
-            <div id="aviso-error" class="error-message"></div>
+            <div id="feriado-error" class="error-message"></div>
             
-            <div id="form-novo-aviso">
-                <input type="text" id="aviso-titulo" placeholder="Título do Aviso">
-                <textarea id="aviso-conteudo" placeholder="O que você quer avisar?"></textarea>
-                <button id="btn-postar-aviso">Postar Aviso</button>
+            <div id="form-novo-feriado">
+                <label for="feriado-titulo">Nome do Feriado</label>
+                <input type="text" id="feriado-titulo" placeholder="Ex: Proclamação da República">
+                
+                <label for="feriado-data">Data do Feriado</label>
+                <input type="date" id="feriado-data">
+                
+                <button id="btn-postar-feriado">Postar Feriado</button>
             </div>
 
             <hr>
 
-            <h2>Avisos da Turma</h2>
-            <div id="lista-avisos">
-                <p>Carregando avisos...</p>
+            <h2>Feriados Cadastrados</h2>
+            <div id="lista-feriados">
+                <p>Carregando feriados...</p>
             </div>
         </main>
     </div> <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script src="app.js"></script>
 
     <script>
-        // --- SCRIPT DESTA PÁGINA TOTALMENTE ATUALIZADO ---
-
-        /**
-         * ESTA FUNÇÃO AGORA VERIFICA SE O USUÁRIO É ADMIN
-         */
+        // SCRIPT ATUALIZADO
         async function verificarSessao() {
             const { data: { session } } = await clienteSupabase.auth.getSession();
             if (!session) {
                 window.location.href = 'index.html';
-                return; // Para a execução
+                return;
             }
 
-            // AGORA, VERIFICA SE É ADMIN
             const { data: profile, error } = await clienteSupabase
                 .from('profiles')
                 .select('role, avatar_url')
                 .eq('id', session.user.id)
-                .single(); // Usamos .single() pois o admin DEVE ter um perfil
+                .single();
             
             if (error || !profile) {
-                console.error('Erro ao buscar perfil:', error);
-                window.location.href = 'index.html'; // Chuta se der erro
+                window.location.href = 'index.html';
                 return;
             }
 
-            // SE NÃO FOR ADMIN, chuta para a home do portal
             if (profile.role !== 'admin') {
                 alert('Acesso negado. Esta é uma área administrativa.');
                 window.location.href = 'portal-home.html';
                 return;
             }
 
-            // Se passou em tudo, é admin! Carrega os dados.
             console.log('Admin logado:', session.user.email);
             if (profile.avatar_url) {
                 document.getElementById('header-avatar').style.backgroundImage = `url(${profile.avatar_url})`;
             }
             
-            // Agora sim, carrega os avisos
-            carregarAvisos();
+            // FUNÇÃO CHAMADA ATUALIZADA
+            carregarFeriados();
         }
 
         document.addEventListener('DOMContentLoaded', () => {
             verificarSessao();
 
-            const btnLogout = document.getElementById('btn-logout');
-            btnLogout.addEventListener('click', () => {
+            document.getElementById('btn-logout').addEventListener('click', () => {
                 logoutUsuario();
             });
 
-            // A lógica de postar continua aqui, pois esta é a página de admin
-            const btnPostar = document.getElementById('btn-postar-aviso');
+            // IDs E FUNÇÕES ATUALIZADOS
+            const btnPostar = document.getElementById('btn-postar-feriado');
             btnPostar.addEventListener('click', () => {
-                criarAviso();
+                criarFeriado();
             });
         });
     </script>
-
 </body>
 </html>

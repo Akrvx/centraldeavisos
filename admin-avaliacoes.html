@@ -4,102 +4,100 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" href="style.css">
-    <title>Painel de Avisos - Admin</title>
+    <title>Painel de Avaliações - Admin</title>
 </head>
 <body>
 
     <div class="container">
         <header>
-            <h1>Painel de Avisos</h1>
-
-            <a href="admin-panel.html" style="text-decoration: none;">Voltar ao Painel</a>
+            <h1>Painel de Avaliações</h1>
             
+            <a href="admin-panel.html" style="text-decoration: none;">Voltar ao Painel</a>
             <div id="header-avatar" class="header-avatar"></div>
-
             <button id="btn-logout">Sair (Logout)</button>
         </header>
 
         <hr>
 
         <main>
-            <h2>Postar um Novo Aviso</h2>
+            <h2>Postar Nova Avaliação</h2>
             
-            <div id="aviso-error" class="error-message"></div>
+            <div id="avaliacao-error" class="error-message"></div>
             
-            <div id="form-novo-aviso">
-                <input type="text" id="aviso-titulo" placeholder="Título do Aviso">
-                <textarea id="aviso-conteudo" placeholder="O que você quer avisar?"></textarea>
-                <button id="btn-postar-aviso">Postar Aviso</button>
+            <div id="form-nova-avaliacao">
+                <label for="avaliacao-titulo">Título da Avaliação</label>
+                <input type="text" id="avaliacao-titulo" placeholder="Ex: Prova 1, Trabalho em Grupo">
+                
+                <label for="avaliacao-materia">Matéria</label>
+                <input type="text" id="avaliacao-materia" placeholder="Ex: Engenharia de Software">
+
+                <label for="avaliacao-data">Data da Avaliação</label>
+                <input type="date" id="avaliacao-data">
+
+                <label for="avaliacao-detalhes">Detalhes</label>
+                <textarea id="avaliacao-detalhes" placeholder="Ex: Matéria: Capítulos 1 a 5. Valor: 10 pontos."></textarea>
+                
+                <button id="btn-postar-avaliacao">Postar Avaliação</button>
             </div>
 
             <hr>
 
-            <h2>Avisos da Turma</h2>
-            <div id="lista-avisos">
-                <p>Carregando avisos...</p>
+            <h2>Avaliações Cadastradas</h2>
+            <div id="lista-avaliacoes">
+                <p>Carregando avaliações...</p>
             </div>
         </main>
     </div> <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script src="app.js"></script>
 
     <script>
-        // --- SCRIPT DESTA PÁGINA TOTALMENTE ATUALIZADO ---
-
-        /**
-         * ESTA FUNÇÃO AGORA VERIFICA SE O USUÁRIO É ADMIN
-         */
+        // SCRIPT ATUALIZADO
         async function verificarSessao() {
             const { data: { session } } = await clienteSupabase.auth.getSession();
             if (!session) {
                 window.location.href = 'index.html';
-                return; // Para a execução
+                return;
             }
 
-            // AGORA, VERIFICA SE É ADMIN
             const { data: profile, error } = await clienteSupabase
                 .from('profiles')
                 .select('role, avatar_url')
                 .eq('id', session.user.id)
-                .single(); // Usamos .single() pois o admin DEVE ter um perfil
+                .single();
             
             if (error || !profile) {
-                console.error('Erro ao buscar perfil:', error);
-                window.location.href = 'index.html'; // Chuta se der erro
+                window.location.href = 'index.html';
                 return;
             }
 
-            // SE NÃO FOR ADMIN, chuta para a home do portal
             if (profile.role !== 'admin') {
                 alert('Acesso negado. Esta é uma área administrativa.');
                 window.location.href = 'portal-home.html';
                 return;
             }
 
-            // Se passou em tudo, é admin! Carrega os dados.
             console.log('Admin logado:', session.user.email);
             if (profile.avatar_url) {
                 document.getElementById('header-avatar').style.backgroundImage = `url(${profile.avatar_url})`;
             }
             
-            // Agora sim, carrega os avisos
-            carregarAvisos();
+            // FUNÇÃO CHAMADA ATUALIZADA
+            carregarAvaliacoes();
         }
 
         document.addEventListener('DOMContentLoaded', () => {
             verificarSessao();
 
-            const btnLogout = document.getElementById('btn-logout');
-            btnLogout.addEventListener('click', () => {
+            document.getElementById('btn-logout').addEventListener('click', () => {
                 logoutUsuario();
             });
 
-            // A lógica de postar continua aqui, pois esta é a página de admin
-            const btnPostar = document.getElementById('btn-postar-aviso');
+            // IDs E FUNÇÕES ATUALIZADOS
+            const btnPostar = document.getElementById('btn-postar-avaliacao');
             btnPostar.addEventListener('click', () => {
-                criarAviso();
+                criarAvaliacao();
             });
         });
     </script>
-
 </body>
 </html>

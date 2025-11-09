@@ -3,58 +3,50 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Central de Avisos - Login</title>
-    <link rel="stylesheet" href="style.css">
+    <title>Portal do Aluno - Login</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+    <link rel="stylesheet" href="login-style.css">
 </head>
-<body>
+<body class="login-body">
 
-    <div class="container">
-        <h1>Central de Avisos da Turma</h1>
+    <div class="login-wrapper">
 
-        <div id="form-login">
-            <h2>Login</h2>
+        <div class="login-container">
+            <h2 class="login-logo">Portal do Aluno</h2>
             
-            <div id="login-error" class="error-message"></div>
-            
-            <input type="email" id="login-email" placeholder="Seu e-mail">
-            <input type="password" id="login-senha" placeholder="Sua senha">
-            <button id="btn-login">Entrar</button>
+            <div id="form-login">
+                <div id="login-error" class="error-message"></div>
+
+                <div class="input-group">
+                    <i class="fa fa-user"></i>
+                    <input type="email" id="login-email" placeholder="Usuário (Email)">
+                </div>
+
+                <div class="input-group">
+                    <i class="fa fa-lock"></i>
+                    <input type="password" id="login-senha" placeholder="Senha">
+                </div>
+
+                <button id="btn-login" class="btn-login-acessar">ACESSAR</button>
+            </div>
+
+            <div class="login-links">
+                <a href="#">Esqueceu sua senha?</a>
+                <a href="cadastro.html">Ainda não tem conta? Cadastre-se</a>
+            </div>
         </div>
-
-        <hr>
-
-        <div id="form-cadastro">
-            <h2>Não tem conta? Cadastre-se</h2>
-            
-            <div id="cadastro-error" class="error-message"></div>
-            
-            <input type="email" id="cadastro-email" placeholder="Seu e-mail">
-            <input type="password" id="cadastro-senha" placeholder="Crie uma senha">
-            <button id="btn-cadastro">Cadastrar</button>
-        </div>
-    </div> <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-    
+        
+        </div> <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script src="app.js"></script>
 
     <script>
-        // Pega os botões e campos do HTML
+        // O script aqui só precisa da lógica de LOGIN
         const btnLogin = document.getElementById('btn-login');
-        const btnCadastro = document.getElementById('btn-cadastro');
 
-        // Quando o botão de LOGIN for clicado
         btnLogin.addEventListener('click', () => {
             const email = document.getElementById('login-email').value;
             const senha = document.getElementById('login-senha').value;
-            // Chama a função que está no app.js
             loginUsuario(email, senha);
-        });
-
-        // Quando o botão de CADASTRO for clicado
-        btnCadastro.addEventListener('click', () => {
-            const email = document.getElementById('cadastro-email').value;
-            const senha = document.getElementById('cadastro-senha').value;
-            // Chama a função que está no app.js
-            cadastrarUsuario(email, senha);
         });
     </script>
 

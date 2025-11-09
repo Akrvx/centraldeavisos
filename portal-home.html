@@ -28,8 +28,8 @@
         }
         .portal-nav a:hover {
             background-color: #e9ecef;
-            border-color: #007bff;
-            color: #007bff;
+            border-color: #007bff; /* Você pode mudar isso para vermelho (ex: #d10000) */
+            color: #007bff; /* Você pode mudar isso para vermelho (ex: #d10000) */
         }
         @media (min-width: 768px) {
             .portal-nav {
@@ -60,8 +60,10 @@
                 <a href="mural-avisos.html">Avisos Importantes</a>
                 <a href="anuncios.html">Anúncios</a>
                 <a href="perfil.html">Meu Perfil</a>
-                <a href="admin-avisos.html" id="admin-link" style="display: none;">Painel de Avisos (Admin)</a>
-                <a href="admin-anuncios.html" id="admin-anuncios-link" style="display: none;">Painel de Anúncios (Admin)</a>
+                
+                <a href="admin-panel.html" id="admin-panel-link" style="display: none; background-color: #500; color: white;">
+                    Painel do Administrador
+                </a>
             </nav>
 
         </main>
@@ -69,49 +71,42 @@
     <script src="app.js"></script>
 
     <script>
-        // --- SCRIPT TOTALMENTE ATUALIZADO ---
+        // --- SCRIPT ATUALIZADO (MAIS LIMPO) ---
         async function verificarSessao() {
             const { data: { session } } = await clienteSupabase.auth.getSession();
             if (!session) {
                 window.location.href = 'index.html';
-                return; // Para a execução
+                return;
             }
 
-            // Pega o perfil para checar a role e mostrar o avatar
             const { data: profile } = await clienteSupabase
                 .from('profiles')
                 .select('role, avatar_url')
                 .eq('id', session.user.id)
-                .maybeSingle(); // Usamos maybeSingle para não dar erro se o perfil for novo
+                .maybeSingle(); 
 
-            // Se o perfil for nulo (usuário muito novo),
-            // ele simplesmente não vai mostrar o avatar ou o link de admin, o que está ok.
             if (!profile) {
                 console.log('Usuário logado, mas perfil ainda não carregado.');
                 return;
             }
 
-            // 1. Mostra o avatar (do jeito novo, pela tabela profiles)
             if (profile.avatar_url) {
                 document.getElementById('header-avatar').style.backgroundImage = `url(${profile.avatar_url})`;
             }
 
-            // 2. MOSTRA O LINK DE ADMIN SE A ROLE FOR 'admin'
+            // Mostra o link ÚNICO de Admin
             if (profile.role === 'admin') {
-                document.getElementById('admin-link').style.display = 'block';
-                document.getElementById('admin-anuncios-link').style.display = 'block';
+                document.getElementById('admin-panel-link').style.display = 'block';
             }
         }
 
         document.addEventListener('DOMContentLoaded', () => {
             verificarSessao();
 
-            const btnLogout = document.getElementById('btn-logout');
-            btnLogout.addEventListener('click', () => {
+            document.getElementById('btn-logout').addEventListener('click', () => {
                 logoutUsuario();
             });
         });
     </script>
-
 </body>
 </html>

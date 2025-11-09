@@ -1,78 +1,94 @@
-/* --- style.css --- */
+/* --- style.css (VERSÃO PORTAL MODERNO/VERMELHO) --- */
+/* (Substitua todo o seu CSS por este) */
 
-/* 1. Reset Básico e Fonte */
+/* --- 1. Reset Básico e Fundo --- */
 body {
     font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
-    background-color: #f4f4f9; /* Um cinza bem claro de fundo */
-    color: #333;
+    color: #333; /* Padrão (para caixas claras) */
     margin: 0;
+    
+    /* IMAGEM DE FUNDO (A MESMA DO LOGIN) */
+    background-image: url('https://upload.wikimedia.org/wikipedia/commons/thumb/9/98/Vale_do_Cafe%2C_RJ_07.jpg/1200px-Vale_do_Cafe%2C_RJ_07.jpg');
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+    background-attachment: fixed; /* O fundo não rola com a página */
+    
     padding: 20px;
     display: flex;
     justify-content: center;
-    align-items: center;
+    align-items: flex-start; /* Alinha no topo */
     min-height: 100vh;
     box-sizing: border-box;
 }
 
-/* 2. Container Principal (Centraliza tudo) */
-/* Vamos precisar adicionar <div class="container"> no nosso HTML */
+/* --- 2. Container Principal (O CARTÃO ESCURO) --- */
 .container {
     width: 100%;
-    max-width: 600px; /* Limita a largura do conteúdo */
-    background-color: #ffffff;
+    max-width: 800px; /* Um pouco mais largo para o portal */
+    background: rgba(50, 0, 0, 0.75); /* Vermelho bem escuro, semi-transparente */
     padding: 25px 40px;
     border-radius: 8px;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+    backdrop-filter: blur(5px); /* Efeito de vidro */
+    color: #ffffff; /* TEXTO PADRÃO DENTRO DO CONTAINER FICA BRANCO */
+    margin-top: 20px;
+    margin-bottom: 20px;
 }
 
-h1, h2 {
-    text-align: center;
-    color: #222;
+/* Títulos brancos */
+h1, h2, label {
+    color: #ffffff;
+    font-weight: 300; /* Fonte mais fina, fica mais moderno */
 }
 
-/* 3. Estilo dos Formulários (Inputs e Botões) */
+/* --- 3. Estilo dos Formulários (Inputs e Botões) --- */
 input[type="email"],
 input[type="password"],
 input[type="text"],
+input[type="date"],
 textarea {
     width: 100%;
     padding: 12px 15px;
     margin-bottom: 15px;
     border: 1px solid #ddd;
     border-radius: 5px;
-    box-sizing: border-box; /* Garante que o padding não quebre o layout */
+    box-sizing: border-box; 
     font-size: 16px;
+    background: #fff; /* Fundo branco (contrasta com o container) */
+    color: #333; /* Texto escuro dentro do input */
 }
 
 textarea {
     min-height: 100px;
-    resize: vertical; /* Permite ao usuário redimensionar a altura */
+    resize: vertical;
 }
 
+/* Botões Azuis viram Vermelhos */
 button {
     width: 100%;
     padding: 12px 20px;
-    background-color: #007bff; /* Um azul bonito */
+    background-color: #d10000; /* Vermelho principal */
     color: white;
     border: none;
     border-radius: 5px;
-    cursor: pointer; /* Mãozinha ao passar o mouse */
+    cursor: pointer;
     font-size: 16px;
     font-weight: bold;
-    transition: background-color 0.2s; /* Efeito suave */
+    transition: background-color 0.2s;
 }
 
 button:hover {
-    background-color: #0056b3;
+    background-color: #a10000; /* Vermelho mais escuro */
 }
 
 hr {
     border: none;
-    border-top: 1px solid #eee;
+    border-top: 1px solid rgba(255, 255, 255, 0.3); /* Linha clara transparente */
     margin: 30px 0;
 }
 
-/* 4. Estilo do Header do Dashboard */
+/* --- 4. Estilo do Header --- */
 header {
     display: flex;
     justify-content: space-between;
@@ -84,34 +100,62 @@ header h1 {
     text-align: left;
     margin: 0;
     font-size: 24px;
+    flex-grow: 0;
+    margin-right: 20px;
+    color: #ffffff; /* Força o H1 do header a ser branco */
 }
 
-/* Botão de logout menor */
+/* Link "Voltar" */
+header a {
+    color: #fff;
+    text-decoration: none;
+    margin-left: auto;
+    margin-right: 15px;
+}
+header a:hover {
+    text-decoration: underline;
+}
+
+.header-avatar {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    background-color: #eee;
+    background-size: cover;
+    background-position: center;
+    border: 2px solid #fff;
+    box-shadow: 0 1px 2px rgba(0,0,0,0.1);
+    margin-left: auto;
+    margin-right: 15px;
+}
+/* Faz o "Voltar" e o Avatar funcionarem juntos */
+header a[style*="margin-left: auto;"] {
+    margin-left: 0;
+}
+
+/* Botão de logout (já era vermelho, perfeito) */
 #btn-logout {
-    width: auto; /* Tamanho automático */
-    background-color: #dc3545; /* Vermelho para "sair" */
+    width: auto; 
+    background-color: #dc3545;
 }
-
 #btn-logout:hover {
     background-color: #c82333;
 }
 
-/* 5. Estilo dos Cards de Aviso */
-#lista-avisos {
-    margin-top: 20px;
-}
-
+/* --- 5. Estilo dos Cards (Avisos, Feriados, etc) --- */
+/* Os cards continuam claros para contrastar */
 .aviso {
     background-color: #f9f9f9;
     border: 1px solid #eee;
     border-radius: 5px;
     padding: 15px 20px;
     margin-bottom: 15px;
+    color: #333; /* Texto dentro do card fica escuro */
 }
 
 .aviso h3 {
     margin: 0 0 10px 0;
-    color: #0056b3;
+    color: #a10000; /* Título do card no tom de vermelho */
 }
 
 .aviso p {
@@ -123,48 +167,64 @@ header h1 {
     font-style: italic;
 }
 
-/* 6. (Opcional) Mensagens de Erro */
+/* Botão deletar (já era vermelho, perfeito) */
+.btn-delete {
+    background-color: #dc3545;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    padding: 5px 10px;
+    font-size: 12px;
+    font-weight: bold;
+    cursor: pointer;
+    float: right;
+    width: auto;
+}
+.btn-delete:hover {
+    background-color: #c82333;
+}
+
+/* --- 6. Navegação do Portal (portal-home) --- */
+/* Botões de navegação também ficam claros */
+.portal-nav a {
+    display: block;
+    padding: 40px 20px;
+    background-color: #f4f4f9;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    text-align: center;
+    text-decoration: none;
+    color: #333; /* Texto escuro */
+    font-size: 18px;
+    font-weight: bold;
+    transition: all 0.2s;
+}
+.portal-nav a:hover {
+    background-color: #ffffff;
+    border-color: #d10000;
+    color: #d10000; /* Fica vermelho ao passar o mouse */
+}
+@media (min-width: 768px) {
+    .portal-nav {
+        grid-template-columns: repeat(3, 1fr);
+    }
+}
+
+/* --- 7. Mensagens de Erro/Sucesso --- */
 .error-message {
-    color: #dc3545; /* Vermelho */
-    background-color: #f8d7da;
-    border: 1px solid #f5c6cb;
+    color: #ffffff; /* Texto branco */
+    background-color: #dc3545; /* Fundo vermelho */
+    border: 1px solid #c82333;
     padding: 10px 15px;
     border-radius: 5px;
     margin-bottom: 15px;
     text-align: center;
-    display: none; /* Escondido por padrão */
+    display: none; 
 }
 
-/* --- ADIÇÃO: Estilos do Avatar no Cabeçalho --- */
-
-.header-avatar {
-    width: 40px;
-    height: 40px;
-    border-radius: 50%; /* Círculo perfeito */
-    background-color: #eee; /* Cor de fundo enquanto carrega */
-    background-size: cover;
-    background-position: center;
-    border: 2px solid #fff;
-    box-shadow: 0 1px 2px rgba(0,0,0,0.1);
-    margin-left: auto; /* Joga ele para a direita */
-    margin-right: 15px; /* Espaço antes do botão Sair */
-}
-
-/* Ajuste no header para o novo avatar */
-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding-bottom: 10px;
-}
-
-/* Faz o h1 não ocupar todo o espaço */
-header h1 {
-    flex-grow: 0;
-    margin-right: 20px;
-}
-
-/* Faz o botão de voltar (se existir) não ir para a direita */
-header a[href="portal-home.html"] {
-    margin-left: 0;
+/* Mensagem de sucesso (verde claro) */
+.success-message {
+    color: #155724;
+    background-color: #d4edda;
+    border-color: #c3e6cb;
 }
