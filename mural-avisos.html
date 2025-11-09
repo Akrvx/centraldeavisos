@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="style.css">
+    <title>Avisos Importantes - Portal</title>
+</head>
+<body>
+
+    <div class="container">
+        <header>
+            <h1>Avisos Importantes</h1>
+            
+            <div id="header-avatar" class="header-avatar"></div>
+
+            <button id="btn-logout">Sair (Logout)</button>
+        </header>
+
+        <hr>
+
+        <main>
+            <h2>Avisos da Turma</h2>
+            <div id="lista-avisos">
+                <p>Carregando avisos...</p>
+            </div>
+        </main>
+    </div> <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="app.js"></script>
+
+    <script>
+        // SCRIPT ATUALIZADO
+        async function verificarSessao() {
+            const { data: { session } } = await clienteSupabase.auth.getSession();
+            if (!session) {
+                window.location.href = 'index.html';
+                return; // Para a execução
+            }
+            
+            console.log('Usuário logado:', session.user.email);
+
+            // --- LÓGICA DO AVATAR CORRIGIDA ---
+            // Busca o avatar na tabela 'profiles' (método novo)
+            const { data: profile } = await clienteSupabase
+                .from('profiles')
+                .select('avatar_url')
+                .eq('id', session.user.id)
+                .maybeSingle();
+
+            if (profile && profile.avatar_url) {
+                document.getElementById('header-avatar').style.backgroundImage = `url(${profile.avatar_url})`;
+            }
+
+            // Carrega os avisos (função original desta página)
+            carregarAvisos();
+        }
+
+        document.addEventListener('DOMContentLoaded', () => {
+            verificarSessao();
+
+            const btnLogout = document.getElementById('btn-logout');
+            btnLogout.addEventListener('click', () => {
+                logoutUsuario();
+            });
+
+            // O 'eventListener' DO BOTÃO DE POSTAR FOI REMOVIDO
+        });
+    </script>
+
+</body>
+</html>

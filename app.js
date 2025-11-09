@@ -1,7 +1,7 @@
-// --- app.js (VERSÃO REATORADA COM TABELA 'PROFILES' E URL CORRIGIDA) ---
+// --- app.js (VERSÃO COM CORREÇÃO DE TIMING DO PERFIL) ---
 
 // 1. CONEXÃO COM O SUPABASE
-const SUPABASE_URL = 'https://gtcwclhvapajvigacuyp.supabase.co'; // <-- CORRIGIDO AQUI
+const SUPABASE_URL = 'https://gtcwclhvapajvigacuyp.supabase.co'; 
 const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imd0Y3djbGh2YXBhanZpZ2FjdXlwIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjI3MDc3NDcsImV4cCI6MjA3ODI4Mzc0N30.gEpyYD2LjNzS5rhm4jTSnRtGsjc0ceb6Zzv8MywOWwg';
 
 const { createClient } = supabase;
@@ -33,7 +33,7 @@ function hideMessage(elementId) {
     }
 }
 
-// 2. FUNÇÕES DE AUTENTICAÇÃO (Não mudam)
+// 2. FUNÇÕES DE AUTENTICAÇÃO
 async function cadastrarUsuario(email, senha) {
     hideMessage('cadastro-error');
     const { data, error } = await clienteSupabase.auth.signUp({
@@ -80,7 +80,7 @@ async function logoutUsuario() {
     }
 }
 
-// 3. FUNÇÕES DO BANCO DE DADOS (AVISOS) (Não mudam)
+// 3. FUNÇÕES DO BANCO DE DADOS (AVISOS)
 async function carregarAvisos() {
     const { data, error } = await clienteSupabase
         .from('avisos')      
@@ -136,10 +136,9 @@ async function criarAviso() {
             hideMessage('aviso-error');
         }, 3000);
     }
-} // <-- FIM DA FUNÇÃO criarAviso
+}
 
-
-// --- 4. FUNÇÕES DE PERFIL (TOTALMENTE REESCRITAS) ---
+// --- 4. FUNÇÕES DE PERFIL (COM A CORREÇÃO DE TIMING) ---
 
 /**
  * Carrega os dados do usuário logado da tabela 'profiles' e preenche o formulário.
@@ -150,18 +149,23 @@ async function carregarPerfil() {
         const { data: { user } } = await clienteSupabase.auth.getUser();
         if (!user) throw new Error("Usuário não encontrado.");
 
-        // 2. Pega os dados da tabela 'profiles'
+        // --- CORREÇÃO AQUI ---
+        // Trocamos .single() por .maybeSingle()
+        // .single() gera um ERRO se não achar nada (o que causa o bug)
+        // .maybeSingle() retorna NULO se não achar nada (o que é perfeito)
         const { data: profile, error } = await clienteSupabase
             .from('profiles')
             .select('nome_completo, matricula, curso, avatar_url')
-            .eq('id', user.id) // Onde o 'id' do perfil é o 'id' do usuário
-            .single(); // Esperamos apenas um resultado
+            .eq('id', user.id)
+            .maybeSingle(); // <-- A MUDANÇA ESTÁ AQUI
 
+        // Se houver um erro REAL (ex: sem conexão), nós paramos
         if (error) { throw error; }
 
         // 3. Preenche o formulário
         document.getElementById('perfil-email').value = user.email;
         
+        // Se o perfil foi encontrado (NÃO é nulo), preenche os campos
         if (profile) {
             document.getElementById('perfil-nome').value = profile.nome_completo || '';
             document.getElementById('perfil-matricula').value = profile.matricula || '';
@@ -172,6 +176,10 @@ async function carregarPerfil() {
             } else {
                 document.getElementById('avatar-preview').style.backgroundImage = `url('https://via.placeholder.com/150')`;
             }
+        } else {
+            // Se o perfil for nulo (usuário muito novo), apenas mostra os campos vazios
+            // e o placeholder.
+            document.getElementById('avatar-preview').style.backgroundImage = `url('https://via.placeholder.com/150')`;
         }
     } catch (error) {
         console.error('Erro ao carregar perfil:', error);

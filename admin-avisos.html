@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="style.css">
+    <title>Painel de Avisos - Admin</title>
+</head>
+<body>
+
+    <div class="container">
+        <header>
+            <h1>Painel de Avisos (Admin)</h1>
+            
+            <div id="header-avatar" class="header-avatar"></div>
+
+            <button id="btn-logout">Sair (Logout)</button>
+        </header>
+
+        <hr>
+
+        <main>
+            <h2>Postar um Novo Aviso</h2>
+            
+            <div id="aviso-error" class="error-message"></div>
+            
+            <div id="form-novo-aviso">
+                <input type="text" id="aviso-titulo" placeholder="Título do Aviso">
+                <textarea id="aviso-conteudo" placeholder="O que você quer avisar?"></textarea>
+                <button id="btn-postar-aviso">Postar Aviso</button>
+            </div>
+
+            <hr>
+
+            <h2>Avisos da Turma</h2>
+            <div id="lista-avisos">
+                <p>Carregando avisos...</p>
+            </div>
+        </main>
+    </div> <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="app.js"></script>
+
+    <script>
+        // --- SCRIPT DESTA PÁGINA TOTALMENTE ATUALIZADO ---
+
+        /**
+         * ESTA FUNÇÃO AGORA VERIFICA SE O USUÁRIO É ADMIN
+         */
+        async function verificarSessao() {
+            const { data: { session } } = await clienteSupabase.auth.getSession();
+            if (!session) {
+                window.location.href = 'index.html';
+                return; // Para a execução
+            }
+
+            // AGORA, VERIFICA SE É ADMIN
+            const { data: profile, error } = await clienteSupabase
+                .from('profiles')
+                .select('role, avatar_url')
+                .eq('id', session.user.id)
+                .single(); // Usamos .single() pois o admin DEVE ter um perfil
+            
+            if (error || !profile) {
+                console.error('Erro ao buscar perfil:', error);
+                window.location.href = 'index.html'; // Chuta se der erro
+                return;
+            }
+
+            // SE NÃO FOR ADMIN, chuta para a home do portal
+            if (profile.role !== 'admin') {
+                alert('Acesso negado. Esta é uma área administrativa.');
+                window.location.href = 'portal-home.html';
+                return;
+            }
+
+            // Se passou em tudo, é admin! Carrega os dados.
+            console.log('Admin logado:', session.user.email);
+            if (profile.avatar_url) {
+                document.getElementById('header-avatar').style.backgroundImage = `url(${profile.avatar_url})`;
+            }
+            
+            // Agora sim, carrega os avisos
+            carregarAvisos();
+        }
+
+        document.addEventListener('DOMContentLoaded', () => {
+            verificarSessao();
+
+            const btnLogout = document.getElementById('btn-logout');
+            btnLogout.addEventListener('click', () => {
+                logoutUsuario();
+            });
+
+            // A lógica de postar continua aqui, pois esta é a página de admin
+            const btnPostar = document.getElementById('btn-postar-aviso');
+            btnPostar.addEventListener('click', () => {
+                criarAviso();
+            });
+        });
+    </script>
+
+</body>
+</html>
