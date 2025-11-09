@@ -1,4 +1,4 @@
-// --- app.js (VERSÃO CORRIGIDA - PERFIL E UPLOAD) ---
+// --- app.js (VERSÃO COM FUNÇÃO DE REMOVER AVATAR) ---
 
 // 1. CONEXÃO COM O SUPABASE
 const SUPABASE_URL = 'https://gtcwclhvapajvigacuyp.supabase.co'; 
@@ -182,7 +182,7 @@ async function criarAviso() {
 } // <-- FIM DA FUNÇÃO criarAviso
 
 
-// 4. FUNÇÕES DE PERFIL (Corrigidas para ficarem DO LADO DE FORA)
+// 4. FUNÇÕES DE PERFIL
 
 /**
  * Carrega os dados do usuário logado e preenche o formulário de perfil.
@@ -203,6 +203,10 @@ async function carregarPerfil(user) {
         // Preenche a imagem de avatar (se existir)
         if (metadata && metadata.avatar_url) {
             document.getElementById('avatar-preview').style.backgroundImage = `url(${metadata.avatar_url})`;
+        } else {
+            // --- AJUSTE AQUI ---
+            // Garante que o placeholder apareça se não houver foto
+            document.getElementById('avatar-preview').style.backgroundImage = `url('https://via.placeholder.com/150')`;
         }
     } catch (error) {
         console.error('Erro ao carregar perfil:', error);
@@ -223,7 +227,6 @@ async function atualizarPerfil(nome, file) {
         
         // 1. Se o usuário enviou um ARQUIVO (foto)
         if (file) {
-            // --- CORREÇÃO AQUI ---
             // Remove o 'public/' do caminho do arquivo
             const filePath = `${user.id}-${new Date().getTime()}-${file.name}`;
             
@@ -298,5 +301,39 @@ async function atualizarSenha(novaSenha) {
     } catch (error) {
         console.error('Erro ao alterar senha:', error.message);
         showMessage('senha-message', 'Erro ao alterar senha: ' + error.message);
+    }
+}
+
+
+// --- NOVA FUNÇÃO ADICIONADA AQUI ---
+/**
+ * Remove a foto de perfil do usuário.
+ */
+async function removerAvatar() {
+    try {
+        hideMessage('perfil-message');
+        
+        // URL do placeholder
+        const placeholder = 'https://via.placeholder.com/150';
+
+        // Atualiza os metadados do usuário para null
+        const { error } = await clienteSupabase.auth.updateUser({
+            data: { 
+                avatar_url: null 
+            }
+        });
+
+        if (error) { throw error; }
+
+        // Atualiza a imagem de preview na hora
+        document.getElementById('avatar-preview').style.backgroundImage = `url('${placeholder}')`;
+        // Limpa o campo de "Escolher arquivo"
+        document.getElementById('perfil-avatar').value = null; 
+        
+        showMessage('perfil-message', 'Foto de perfil removida!', false);
+
+    } catch (error) {
+        console.error('Erro ao remover avatar:', error.message);
+        showMessage('perfil-message', 'Erro ao remover foto: ' + error.message);
     }
 }
