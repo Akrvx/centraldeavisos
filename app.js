@@ -426,4 +426,139 @@ async function deletarAnuncio(id) {
         console.error('Erro ao deletar anúncio:', error.message);
         showMessage('anuncio-error', 'Erro ao deletar: ' + error.message);
     }
+
+    // --- SEÇÃO 8. FUNÇÕES DO BANCO DE DADOS (AVALIAÇÕES) ---
+// (Adicione esta seção ao final do seu app.js)
+
+/**
+ * Carrega as avaliações da tabela 'avaliacoes'.
+ */
+async function carregarAvaliacoes() {
+    // Verifica se estamos na página de admin para mostrar o botão Deletar
+    const isAdmin = document.getElementById('btn-postar-avaliacao') !== null;
+
+    const { data, error } = await clienteSupabase
+        .from('avaliacoes')
+        .select('*') // Pega todos os campos, incluindo o ID para deletar
+        .order('data_avaliacao', { ascending: true }); // Ordena por data
+
+    if (error) {
+        console.error('Erro ao carregar avaliações:', error.message);
+        showMessage('avaliacao-error', 'Erro ao carregar as avaliações. Tente recarregar a página.');
+        return;
+    }
+
+    const listaAvaliacoes = document.getElementById('lista-avaliacoes');
+    listaAvaliacoes.innerHTML = '';
+
+    if (data.length === 0) {
+        listaAvaliacoes.innerHTML = '<p>Nenhuma avaliação cadastrada ainda.</p>';
+        return;
+    }
+
+    data.forEach(avaliacao => {
+        const divAvaliacao = document.createElement('div');
+        divAvaliacao.classList.add('aviso'); // Reutiliza o estilo de card
+        
+        let deleteButtonHTML = '';
+        if (isAdmin) {
+            deleteButtonHTML = `<button class="btn-delete" onclick="deletarAvaliacao(${avaliacao.id})">Deletar</button>`;
+        }
+
+        // Formata a data
+        const dataFormatada = new Date(avaliacao.data_avaliacao).toLocaleDateString('pt-BR', {
+            day: '2-digit',
+            month: '2-digit',
+            year: 'numeric',
+            timeZone: 'UTC' 
+        });
+
+        divAvaliacao.innerHTML = `
+            ${deleteButtonHTML}
+            <h3>${avaliacao.titulo} (${avaliacao.materia})</h3>
+            <p>Data: ${dataFormatada}</p>
+            <p>Detalhes: ${avaliacao.detalhes}</p> 
+        `;
+        listaAvaliacoes.appendChild(divAvaliacao);
+    });
+}
+
+/**
+ * Cria uma nova avaliação (somente admin).
+ */
+async function criarAvaliacao() {
+    hideMessage('avaliacao-error');
+    
+    // Pega os novos campos do HTML
+    const titulo = document.getElementById('avaliacao-titulo').value;
+    const materia = document.getElementById('avaliacao-materia').value;
+    const dataAvaliacao = document.getElementById('avaliacao-data').value;
+    const detalhes = document.getElementById('avaliacao-detalhes').value;
+
+    // Validação
+    if (!titulo || !materia || !dataAvaliacao) {
+        showMessage('avaliacao-error', 'Por favor, preencha o título, a matéria e a data.');
+        return;
+    }
+
+    const { data: { user } } = await clienteSupabase.auth.getUser();
+
+    // Insere os dados na tabela 'avaliacoes'
+    const { data, error } = await clienteSupabase
+        .from('avaliacoes')
+        .insert([
+            { 
+                titulo: titulo, 
+                materia: materia,
+                data_avaliacao: dataAvaliacao,
+                detalhes: detalhes, 
+                user_id: user.id 
+            } 
+        ]);
+
+    if (error) {
+        console.error('Erro ao criar avaliação:', error.message);
+        showMessage('avaliacao-error', 'Erro ao postar avaliação: ' + error.message);
+    } else {
+        console.log('Avaliação criada:', data);
+        showMessage('avaliacao-error', 'Avaliação postada com sucesso!', false);
+        
+        // Limpa os campos
+        document.getElementById('avaliacao-titulo').value = '';
+        document.getElementById('avaliacao-materia').value = '';
+        document.getElementById('avaliacao-data').value = '';
+        document.getElementById('avaliacao-detalhes').value = '';
+        
+        carregarAvaliacoes(); // Recarrega a lista
+        setTimeout(() => { hideMessage('avaliacao-error'); }, 3000);
+    }
+}
+
+/**
+ * Deleta uma avaliação (somente admin).
+ * @param {number} id - O ID da avaliação a ser deletada.
+ */
+async function deletarAvaliacao(id) {
+    if (!confirm('Tem certeza que deseja deletar esta avaliação? Esta ação não pode ser desfeita.')) {
+        return;
+    }
+
+    try {
+        const { error } = await clienteSupabase
+            .from('avaliacoes')
+            .delete()
+            .eq('id', id);
+
+        if (error) {
+            throw error;
+        }
+
+        // Sucesso! Recarrega a lista
+        carregarAvaliacoes();
+
+    } catch (error) {
+        console.error('Erro ao deletar avaliação:', error.message);
+        showMessage('avaliacao-error', 'Erro ao deletar: ' + error.message);
+    }
+}
 }
