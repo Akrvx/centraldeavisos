@@ -563,6 +563,7 @@ async function deletarAvaliacao(id) {
         }
 
         carregarAvaliacoes();
+        
 
     } catch (error) {
         console.error('Erro ao deletar avaliação:', error.message);
