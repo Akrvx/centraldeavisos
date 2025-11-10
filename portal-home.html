@@ -5,39 +5,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" href="style.css">
     <title>Portal do Aluno - Home</title>
-    
-    <style>
-        .portal-nav {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-            gap: 20px; 
-            margin-top: 20px;
-        }
-        .portal-nav a {
-            display: block;
-            padding: 40px 20px;
-            background-color: #f4f4f9;
-            border: 1px solid #ddd;
-            border-radius: 8px;
-            text-align: center;
-            text-decoration: none;
-            color: #333;
-            font-size: 18px;
-            font-weight: bold;
-            transition: all 0.2s;
-        }
-        .portal-nav a:hover {
-            background-color: #e9ecef;
-            border-color: #007bff; /* Você pode mudar isso para vermelho (ex: #d10000) */
-            color: #007bff; /* Você pode mudar isso para vermelho (ex: #d10000) */
-        }
-        @media (min-width: 768px) {
-            .portal-nav {
-                grid-template-columns: repeat(3, 1fr);
-            }
-        }
-    </style>
-</head>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+    </head>
 <body>
 
     <div class="container">
@@ -52,26 +21,47 @@
         <hr>
 
         <main>
-            <h2>O que você gostaria de fazer?</h2>
+            <h2>O que você gostaria de fazer hoje?</h2>
             
-            <nav class="portal-nav">
-                <a href="avaliacoes.html">Avaliações</a>
-                <a href="feriados.html">Feriados</a>
-                <a href="mural-avisos.html">Avisos Importantes</a>
-                <a href="anuncios.html">Anúncios</a>
-                <a href="perfil.html">Meu Perfil</a>
-                
-                <a href="admin-panel.html" id="admin-panel-link" style="display: none; background-color: #500; color: white;">
-                    Painel do Administrador
+            <div class="dashboard-grid">
+
+                <a href="avaliacoes.html" class="dashboard-card card-orange-light">
+                    <div class="card-icon"><i class="fa fa-calendar-check"></i></div>
+                    <div class="card-title">Avaliações</div>
                 </a>
-            </nav>
+
+                <a href="feriados.html" class="dashboard-card card-green-light">
+                    <div class="card-icon"><i class="fa fa-gifts"></i></div>
+                    <div class="card-title">Feriados</div>
+                </a>
+
+                <a href="mural-avisos.html" class="dashboard-card card-red-light">
+                    <div class="card-icon"><i class="fa fa-bullhorn"></i></div>
+                    <div class="card-title">Avisos Importantes</div>
+                </a>
+
+                <a href="anuncios.html" class="dashboard-card card-blue-light">
+                    <div class="card-icon"><i class="fa fa-newspaper"></i></div>
+                    <div class="card-title">Anúncios</div>
+                </a>
+
+                <a href="perfil.html" class="dashboard-card card-gray-light">
+                    <div class="card-icon"><i class="fa fa-user"></i></div>
+                    <div class="card-title">Meu Perfil</div>
+                </a>
+                
+                <a href="admin-panel.html" id="admin-panel-link" class="dashboard-card card-dark" style="display: none;">
+                    <div class="card-icon"><i class="fa fa-user-cog"></i></div>
+                    <div class="card-title">Painel do Administrador</div>
+                </a>
+            </div>
 
         </main>
     </div> <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script src="app.js"></script>
 
     <script>
-        // --- SCRIPT ATUALIZADO (MAIS LIMPO) ---
+        // O SCRIPT NÃO MUDA (A LÓGICA DE ADMIN É A MESMA)
         async function verificarSessao() {
             const { data: { session } } = await clienteSupabase.auth.getSession();
             if (!session) {

@@ -4,18 +4,14 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" href="style.css">
-    <title>Painel do Admin - Portal</title>
-    <style>
-        .portal-nav a {
-            padding: 30px 20px; /* Botões um pouco menores */
-        }
-    </style>
+    <title>Cabine de Comando ✈️</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
 </head>
 <body>
 
-    <div class="container">
+    <div class="container admin-container">
         <header>
-            <h1>Painel do Administrador</h1>
+            <h1>Cabine de Comando</h1>
             
             <a href="portal-home.html" style="text-decoration: none;">Voltar ao Portal</a>
             
@@ -26,21 +22,53 @@
         <hr>
 
         <main>
-            <h2>Gerenciamento</h2>
+            <h2>Ações Rápidas</h2>
             
-            <nav class="portal-nav">
-                <a href="admin-avisos.html">Gerenciar Avisos</a>
-                <a href="admin-anuncios.html">Gerenciar Anúncios</a>
-                <a href="admin-feriados.html">Gerenciar Feriados</a>
-                <a href="admin-avaliacoes.html">Gerenciar Avaliações</a>
-                </nav>
+            <div class="dashboard-grid">
+
+                <a href="admin-avisos.html" class="dashboard-card card-red">
+                    <div class="card-icon"><i class="fa fa-bullhorn"></i></div>
+                    <div class="card-title">Gerenciar Avisos</div>
+                    <p class="card-desc">Postar e deletar comunicados urgentes.</p>
+                </a>
+
+                <a href="admin-anuncios.html" class="dashboard-card card-blue">
+                    <div class="card-icon"><i class="fa fa-newspaper"></i></div>
+                    <div class="card-title">Gerenciar Anúncios</div>
+                    <p class="card-desc">Comunicações de rotina e informativos.</p>
+                </a>
+
+                <a href="admin-avaliacoes.html" class="dashboard-card card-orange">
+                    <div class="card-icon"><i class="fa fa-calendar-alt"></i></div>
+                    <div class="card-title">Gerenciar Avaliações</div>
+                    <p class="card-desc">Cadastrar provas, trabalhos e datas.</p>
+                </a>
+
+                <a href="admin-feriados.html" class="dashboard-card card-green">
+                    <div class="card-icon"><i class="fa fa-gifts"></i></div>
+                    <div class="card-title">Gerenciar Feriados</div>
+                    <p class="card-desc">Atualizar o calendário da turma.</p>
+                </a>
+
+                <a href="#" class="dashboard-card card-purple disabled">
+                    <div class="card-icon"><i class="fa fa-envelope"></i></div>
+                    <div class="card-title">Caixa de Mensagens</div>
+                    <p class="card-desc">Enviar mensagens privadas aos alunos. (Em desenvolvimento)</p>
+                </a>
+                
+                <a href="perfil.html" class="dashboard-card card-gray">
+                    <div class="card-icon"><i class="fa fa-user-cog"></i></div>
+                    <div class="card-title">Configurar Meu Perfil</div>
+                    <p class="card-desc">Alterar foto e informações.</p>
+                </a>
+
+            </div>
         </main>
     </div> <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script src="app.js"></script>
 
     <script>
-        // SCRIPT DE SEGURANÇA (ESSENCIAL)
-        // Esta página inteira é protegida para admins
+        // SCRIPT DE SEGURANÇA (O MESMO DE ANTES)
         async function verificarSessao() {
             const { data: { session } } = await clienteSupabase.auth.getSession();
             if (!session) {
@@ -59,14 +87,12 @@
                 return;
             }
 
-            // SE NÃO FOR ADMIN, chuta para a home do portal
             if (profile.role !== 'admin') {
                 alert('Acesso negado.');
                 window.location.href = 'portal-home.html';
                 return;
             }
 
-            // Se for admin, carrega o avatar
             if (profile.avatar_url) {
                 document.getElementById('header-avatar').style.backgroundImage = `url(${profile.avatar_url})`;
             }

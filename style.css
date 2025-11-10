@@ -17,7 +17,7 @@ body {
     padding: 20px;
     display: flex;
     justify-content: center;
-    align-items: flex-start; /* Alinha no topo */
+    align-items: center; 
     min-height: 100vh;
     box-sizing: border-box;
 }
@@ -227,4 +227,112 @@ header a[style*="margin-left: auto;"] {
     color: #155724;
     background-color: #d4edda;
     border-color: #c3e6cb;
+}
+
+/* --- ADIÇÃO: Estilos de Dashboard Moderno (Para admin-panel.html) --- */
+
+.dashboard-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    gap: 20px;
+    margin-top: 20px;
+}
+
+.dashboard-card {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    text-decoration: none;
+    color: #fff;
+    background-color: rgba(0, 0, 0, 0.5); /* Fundo escuro */
+    padding: 25px;
+    border-radius: 10px;
+    transition: transform 0.2s, box-shadow 0.2s;
+    border-top: 4px solid transparent; /* Para a cor de destaque */
+}
+
+.dashboard-card:hover {
+    transform: translateY(-5px); /* Efeito 3D leve */
+    box-shadow: 0 8px 15px rgba(0, 0, 0, 0.4);
+}
+
+.card-icon {
+    font-size: 36px;
+    margin-bottom: 15px;
+    height: 40px;
+}
+
+.card-title {
+    font-size: 18px;
+    font-weight: bold;
+    margin-bottom: 5px;
+}
+
+.card-desc {
+    font-size: 12px;
+    color: #ccc;
+    margin: 0;
+}
+
+/* Cores de destaque (Border Top) */
+.card-red { border-top-color: #dc3545; }
+.card-blue { border-top-color: #007bff; }
+.card-orange { border-top-color: #ffc107; }
+.card-green { border-top-color: #28a745; }
+.card-purple { border-top-color: #6f42c1; }
+.card-gray { border-top-color: #6c757d; }
+
+/* Estilo para cartões desabilitados (futuro) */
+.dashboard-card.disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+.dashboard-card.disabled:hover {
+    transform: none;
+    box-shadow: none;
+}
+
+/* --- ADIÇÃO AO style.css: Estilos dos Cards do Aluno --- */
+
+/* Estilos de Card do Aluno (Claro) */
+.dashboard-card.card-orange-light { border-top-color: #ffaa00; background-color: #fff; color: #333; }
+.dashboard-card.card-green-light { border-top-color: #38b000; background-color: #fff; color: #333; }
+.dashboard-card.card-red-light { border-top-color: #d10000; background-color: #fff; color: #333; }
+.dashboard-card.card-blue-light { border-top-color: #007bff; background-color: #fff; color: #333; }
+.dashboard-card.card-gray-light { border-top-color: #6c757d; background-color: #fff; color: #333; }
+.dashboard-card.card-dark { border-top-color: #333; background-color: rgba(0, 0, 0, 0.7); } /* Admin link */
+
+/* Garante que o texto e o ícone sejam da cor do tema no hover */
+.dashboard-card.card-red-light:hover { 
+    border-color: #d10000; 
+    color: #d10000;
+}
+.dashboard-card.card-blue-light:hover { 
+    border-color: #007bff; 
+    color: #007bff;
+}
+.dashboard-card.card-orange-light:hover { 
+    border-color: #ffaa00; 
+    color: #ffaa00;
+}
+/* ... e assim por diante para todas as cores claras */
+
+/* Garante que o ícone escuro dos cards claros fique visível no hover */
+.dashboard-card.card-red-light:hover .card-icon,
+.dashboard-card.card-blue-light:hover .card-icon,
+.dashboard-card.card-orange-light:hover .card-icon,
+.dashboard-card.card-green-light:hover .card-icon,
+.dashboard-card.card-gray-light:hover .card-icon {
+    color: inherit; /* Pega a cor do hover */
+}
+
+/* Garante que o ícone escuro dos cards claros comece escuro */
+.dashboard-card.card-red-light .card-icon,
+.dashboard-card.card-blue-light .card-icon,
+.dashboard-card.card-orange-light .card-icon,
+.dashboard-card.card-green-light .card-icon,
+.dashboard-card.card-gray-light .card-icon {
+    color: #333; 
 }
