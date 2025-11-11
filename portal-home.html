@@ -6,15 +6,13 @@
     <link rel="stylesheet" href="style.css">
     <title>Portal do Aluno - Home</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
-    </head>
+</head>
 <body>
 
     <div class="container">
         <header>
             <h1>Portal do Aluno</h1>
-            
             <div id="header-avatar" class="header-avatar"></div>
-            
             <button id="btn-logout">Sair (Logout)</button>
         </header>
 
@@ -84,7 +82,6 @@
                 document.getElementById('header-avatar').style.backgroundImage = `url(${profile.avatar_url})`;
             }
 
-            // Mostra o link ÚNICO de Admin
             if (profile.role === 'admin') {
                 document.getElementById('admin-panel-link').style.display = 'block';
             }
@@ -92,7 +89,6 @@
 
         document.addEventListener('DOMContentLoaded', () => {
             verificarSessao();
-
             document.getElementById('btn-logout').addEventListener('click', () => {
                 logoutUsuario();
             });

@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="style.css">
+    <title>Gerenciar Usuários - Admin</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+    
+    <style>
+        .admin-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+            color: #fff; /* Texto da tabela branco */
+        }
+        .admin-table th, .admin-table td {
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            padding: 10px 12px;
+            text-align: left;
+        }
+        .admin-table th {
+            background-color: rgba(0, 0, 0, 0.3);
+            font-weight: bold;
+        }
+        .admin-table tr:nth-child(even) {
+            background-color: rgba(0, 0, 0, 0.1);
+        }
+        /* Estilo do Dropdown de Role */
+        .role-select {
+            padding: 5px;
+            border-radius: 4px;
+            border: 1px solid #ddd;
+            background: #fff;
+            color: #333;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <header>
+            <h1>Gerenciar Usuários</h1>
+            <a href="admin-panel.html" style="text-decoration: none;">Voltar ao Painel</a>
+            <div id="header-avatar" class="header-avatar"></div>
+            <button id="btn-logout">Sair (Logout)</button>
+        </header>
+
+        <hr>
+
+        <main>
+            <h2>Usuários Cadastrados</h2>
+            <div id="admin-message" class="error-message" style="display: none;"></div>
+            
+            <table class="admin-table">
+                <thead>
+                    <tr>
+                        <th>Nome Completo</th>
+                        <th>Matrícula</th>
+                        <th>Email</th>
+                        <th>Cargo (Role)</th>
+                        <th>Ação</th>
+                    </tr>
+                </thead>
+                <tbody id="lista-usuarios">
+                    <tr><td colspan="5">Carregando usuários...</td></tr>
+                </tbody>
+            </table>
+        </main>
+    </div> <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="app.js"></script>
+
+    <script>
+        // Script de segurança (essencial)
+        async function verificarSessao() {
+            const { data: { session } } = await clienteSupabase.auth.getSession();
+            if (!session) {
+                window.location.href = 'index.html';
+                return;
+            }
+
+            const { data: profile, error } = await clienteSupabase
+                .from('profiles')
+                .select('role, avatar_url')
+                .eq('id', session.user.id)
+                .single(); 
+            
+            if (error || !profile || profile.role !== 'admin') {
+                alert('Acesso negado.');
+                window.location.href = 'portal-home.html';
+                return;
+            }
+
+            if (profile.avatar_url) {
+                document.getElementById('header-avatar').style.backgroundImage = `url(${profile.avatar_url})`;
+            }
+            
+            // Se for admin, carrega a lista de usuários
+            carregarUsuarios();
+        }
+
+        document.addEventListener('DOMContentLoaded', () => {
+            verificarSessao();
+            document.getElementById('btn-logout').addEventListener('click', () => {
+                logoutUsuario();
+            });
+        });
+    </script>
+</body>
+</html> 

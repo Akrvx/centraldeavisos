@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="style.css">
+    <title>Editando Item - Admin</title>
+</head>
+<body>
+
+    <div class="container">
+        <header>
+            <h1 id="edit-title">Carregando...</h1>
+            
+            <a href="admin-panel.html" style="text-decoration: none;">Voltar ao Painel</a>
+            
+            <div id="header-avatar" class="header-avatar"></div>
+            <button id="btn-logout">Sair (Logout)</button>
+        </header>
+
+        <hr>
+
+        <main>
+            <div id="edit-error" class="error-message"></div>
+            
+            <div id="form-container">
+                <p>Carregando dados do item...</p>
+            </div>
+            
+            <button id="btn-salvar-edicao" style="margin-top: 20px;">Salvar Alterações</button>
+            
+        </main>
+    </div> <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="app.js"></script>
+
+    <script>
+        // Script SÓ para esta página
+        async function verificarSessao() {
+            const { data: { session } } = await clienteSupabase.auth.getSession();
+            if (!session) {
+                window.location.href = 'index.html';
+                return;
+            }
+
+            // Verifica se é admin (necessário para esta página)
+            const { data: profile, error } = await clienteSupabase
+                .from('profiles')
+                .select('role, avatar_url')
+                .eq('id', session.user.id)
+                .single(); 
+            
+            if (error || !profile || profile.role !== 'admin') {
+                alert('Acesso negado.');
+                window.location.href = 'portal-home.html';
+                return;
+            }
+
+            // Se for admin, carrega o avatar
+            if (profile.avatar_url) {
+                document.getElementById('header-avatar').style.backgroundImage = `url(${profile.avatar_url})`;
+            }
+            
+            // --- FUNÇÃO PRINCIPAL DA PÁGINA ---
+            // Chama a função do app.js para carregar e construir o formulário
+            carregarItemParaEdicao();
+        }
+
+        document.addEventListener('DOMContentLoaded', () => {
+            verificarSessao();
+
+            document.getElementById('btn-logout').addEventListener('click', () => {
+                logoutUsuario();
+            });
+
+            // Conecta o botão Salvar à nova função do app.js
+            document.getElementById('btn-salvar-edicao').addEventListener('click', () => {
+                salvarEdicao();
+            });
+        });
+    </script>
+</body>
+</html>

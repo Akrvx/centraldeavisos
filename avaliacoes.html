@@ -11,11 +11,8 @@
     <div class="container">
         <header>
             <h1>Avaliações</h1>
-            
             <a href="portal-home.html" style="text-decoration: none;">Voltar</a>
-            
             <div id="header-avatar" class="header-avatar"></div>
-
             <button id="btn-logout">Sair (Logout)</button>
         </header>
 
@@ -32,7 +29,6 @@
     <script src="app.js"></script>
 
     <script>
-        // SCRIPT ATUALIZADO
         async function verificarSessao() {
             const { data: { session } } = await clienteSupabase.auth.getSession();
             if (!session) {
@@ -40,7 +36,6 @@
                 return;
             }
             
-            console.log('Usuário logado:', session.user.email);
             const { data: profile } = await clienteSupabase
                 .from('profiles')
                 .select('avatar_url')
@@ -51,7 +46,7 @@
                 document.getElementById('header-avatar').style.backgroundImage = `url(${profile.avatar_url})`;
             }
 
-            // FUNÇÃO CHAMADA ATUALIZADA
+            // Esta função já existe no seu app.js e já cria uma lista!
             carregarAvaliacoes();
         }
 

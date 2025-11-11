@@ -336,3 +336,61 @@ header a[style*="margin-left: auto;"] {
 .dashboard-card.card-gray-light .card-icon {
     color: #333; 
 }
+
+.portal-signature {
+    text-align: center;
+    font-size: 12px;
+    color: rgba(255, 255, 255, 0.5); /* Branco 50% transparente */
+    margin-top: 30px; 
+}
+
+/* --- 6. Estilo do Botão Deletar --- */
+/* (Você já tem esse) */
+.btn-delete {
+    background-color: #dc3545; /* Vermelho */
+    color: white;
+    border: none;
+    border-radius: 4px;
+    padding: 5px 10px;
+    font-size: 12px;
+    font-weight: bold;
+    cursor: pointer;
+    float: right; 
+    width: auto;
+    margin-left: 5px; /* Espaço entre os botões */
+}
+.btn-delete:hover {
+    background-color: #c82333;
+}
+
+/* --- NOVO ESTILO AQUI --- */
+.btn-edit {
+    background-color: #007bff; /* Azul */
+    color: white;
+    border: none;
+    border-radius: 4px;
+    padding: 5px 10px;
+    font-size: 12px;
+    font-weight: bold;
+    cursor: pointer;
+    float: right; 
+    width: auto; 
+    text-decoration: none; /* Para parecer um botão */
+}
+.btn-edit:hover {
+    background-color: #0056b3;
+}
+
+.card-yellow { border-top-color: #ffc107; }
+
+/* --- ADIÇÃO AO style.css: Cores Laranja e Verde Claras --- */
+
+.dashboard-card.card-orange-light { border-top-color: #ffaa00; background-color: #fff; color: #333; }
+.dashboard-card.card-orange-light:hover { border-color: #ffaa00; color: #ffaa00; }
+.dashboard-card.card-orange-light:hover .card-icon { color: inherit; }
+.dashboard-card.card-orange-light .card-icon { color: #333; }
+
+.dashboard-card.card-green-light { border-top-color: #38b000; background-color: #fff; color: #333; }
+.dashboard-card.card-green-light:hover { border-color: #38b000; color: #38b000; }
+.dashboard-card.card-green-light:hover .card-icon { color: inherit; }
+.dashboard-card.card-green-light .card-icon { color: #333; }

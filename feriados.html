@@ -4,35 +4,94 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" href="style.css">
-    <title>Feriados - Portal</title>
+    <title>Calendário - Portal do Aluno</title>
+
+    <script src='https://cdn.jsdelivr.net/npm/fullcalendar@6.1.14/index.global.min.js'></script>
+    
+    <style>
+        /* Container do calendário */
+        #calendario {
+            max-width: 100%;
+            margin: 0 auto;
+        }
+
+        /* --- TEMA ESCURO PARA O CALENDÁRIO --- */
+        
+        /* Cor dos botões e cabeçalho (vermelho do tema) */
+        .fc .fc-button-primary {
+            background-color: #d10000;
+            border-color: #d10000;
+        }
+        .fc .fc-button-primary:hover {
+            background-color: #a10000;
+            border-color: #a10000;
+        }
+        .fc .fc-toolbar-title {
+            color: #ffffff; /* Título do mês (branco) */
+        }
+        .fc-col-header-cell-cushion {
+            color: #ccc; /* Dias da semana (Seg, Ter...) */
+            text-decoration: none;
+        }
+        
+        /* Cor dos dias (números) */
+        .fc .fc-daygrid-day-number {
+            color: #eee;
+            text-decoration: none;
+        }
+        /* Cor dos dias de outros meses (mais apagados) */
+        .fc .fc-day-other .fc-daygrid-day-number {
+            color: #777;
+        }
+        
+        /* Remove a borda feia da tabela */
+        .fc, .fc-scrollgrid, .fc-theme-standard td, .fc-theme-standard th {
+             border: 1px solid rgba(255, 255, 255, 0.3) !important;
+        }
+
+        /* --- Estilo dos Eventos --- */
+        .fc-event {
+            cursor: pointer;
+            border: none !important;
+            padding: 2px 5px;
+            font-size: 13px;
+        }
+        /* Evento de Avaliação (Laranja) */
+        .fc-event-avaliacao {
+            background-color: #ffc107 !important;
+            color: #333 !important;
+            font-weight: bold;
+        }
+        /* Evento de Feriado (Verde) */
+        .fc-event-feriado {
+            background-color: #28a745 !important;
+        }
+    </style>
 </head>
 <body>
 
     <div class="container">
         <header>
-            <h1>Feriados</h1>
-            
+            <h1>Calendário</h1>
             <a href="portal-home.html" style="text-decoration: none;">Voltar</a>
-            
             <div id="header-avatar" class="header-avatar"></div>
-
             <button id="btn-logout">Sair (Logout)</button>
         </header>
 
         <hr>
 
         <main>
-            <h2>Calendário de Feriados</h2>
-            
-            <div id="lista-feriados">
-                <p>Carregando feriados...</p>
+            <div style="display: flex; justify-content: center; gap: 20px; margin-bottom: 20px;">
+                <span style="font-size: 14px;"><span style="color:#ffc107">■</span> Avaliações</span>
+                <span style="font-size: 14px;"><span style="color:#28a745">■</span> Feriados</span>
             </div>
+
+            <div id='calendario'></div>
         </main>
     </div> <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script src="app.js"></script>
 
     <script>
-        // SCRIPT ATUALIZADO
         async function verificarSessao() {
             const { data: { session } } = await clienteSupabase.auth.getSession();
             if (!session) {
@@ -40,7 +99,6 @@
                 return;
             }
             
-            console.log('Usuário logado:', session.user.email);
             const { data: profile } = await clienteSupabase
                 .from('profiles')
                 .select('avatar_url')
@@ -51,8 +109,8 @@
                 document.getElementById('header-avatar').style.backgroundImage = `url(${profile.avatar_url})`;
             }
 
-            // FUNÇÃO CHAMADA ATUALIZADA
-            carregarFeriados();
+            // FUNÇÃO PRINCIPAL: Carrega e renderiza o calendário
+            renderizarCalendario();
         }
 
         document.addEventListener('DOMContentLoaded', () => {

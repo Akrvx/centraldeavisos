@@ -148,3 +148,31 @@ h2 {
     background-color: #d4edda;
     border-color: #c3e6cb;
 }
+
+/* --- 6. Assinatura do Desenvolvedor --- */
+
+.footer-signature {
+    position: absolute; /* Fixa o texto na tela */
+    bottom: 20px;       /* 20px acima do fundo */
+    left: 0;
+    width: 100%;
+    text-align: center;
+    color: rgba(255, 255, 255, 0.7); /* Branco, com 70% de opacidade */
+    font-size: 14px;
+}
+
+.footer-signature p {
+    margin: 0;
+    padding: 0;
+    /* Adiciona uma sombra leve para facilitar a leitura contra a foto */
+    text-shadow: 0 1px 3px rgba(0, 0, 0, 0.5); 
+}
+
+/* (Opcional) Se quiser adicionar um link */
+.footer-signature a {
+    color: rgba(255, 255, 255, 0.9);
+    text-decoration: none;
+}
+.footer-signature a:hover {
+    text-decoration: underline;
+}
