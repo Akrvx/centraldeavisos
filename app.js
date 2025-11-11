@@ -1,4 +1,4 @@
-// --- app.js (VERSÃO COM FUNÇÕES DE 'AVALIAÇÕES') ---
+// --- app.js (VERSÃO FINAL COMPLETA E CORRIGIDA) ---
 
 // 1. CONEXÃO COM O SUPABASE
 const SUPABASE_URL = 'https://gtcwclhvapajvigacuyp.supabase.co'; 
@@ -246,7 +246,7 @@ async function removerAvatar() {
 }
 
 
-// --- 5. FUNÇÕES DO BANCO DE DADOS (ANÚNCIOS) ---
+// 5. FUNÇÕES DO BANCO DE DADOS (ANÚNCIOS)
 async function carregarAnuncios() {
     const isAdmin = document.getElementById('btn-postar-anuncio') !== null;
     const { data, error } = await clienteSupabase
@@ -310,20 +310,17 @@ async function criarAnuncio() {
     }
 }
 
-// --- 6. FUNÇÕES DO BANCO DE DADOS (FERIADOS) ---
+// 6. FUNÇÕES DO BANCO DE DADOS (FERIADOS)
 async function carregarFeriados() {
     const { data, error } = await clienteSupabase
         .from('feriados') 
-        .select('*') // MUDANÇA: Pega o ID para o delete
+        .select('*') 
         .order('data_feriado', { ascending: true }); 
     if (error) {
-        console.error('Erro ao carregar feriados:', error.message);
         showMessage('feriado-error', 'Erro ao carregar os feriados. Tente recarregar a página.');
         return;
     }
     
-    // --- MUDANÇA AQUI ---
-    // Verifica se estamos na página de admin (procurando o botão de postar)
     const isAdmin = document.getElementById('btn-postar-feriado') !== null;
     const listaFeriados = document.getElementById('lista-feriados');
     listaFeriados.innerHTML = ''; 
@@ -336,8 +333,6 @@ async function carregarFeriados() {
         const divFeriado = document.createElement('div');
         divFeriado.classList.add('aviso');
         
-        // --- MUDANÇA AQUI ---
-        // Cria o botão de deletar (se for admin)
         let deleteButtonHTML = '';
         if (isAdmin) {
             deleteButtonHTML = `<button class="btn-delete" onclick="deletarFeriado(${feriado.id})">Deletar</button>`;
@@ -350,7 +345,8 @@ async function carregarFeriados() {
             timeZone: 'UTC' 
         });
         divFeriado.innerHTML = `
-            ${deleteButtonHTML} <h3>${feriado.titulo}</h3>
+            ${deleteButtonHTML}
+            <h3>${feriado.titulo}</h3>
             <p>Data: ${dataFormatada}</p> 
         `;
         listaFeriados.appendChild(divFeriado);
@@ -387,7 +383,7 @@ async function criarFeriado() {
 }
 
 
-// --- 7. FUNÇÕES DE DELETAR (ADMIN) ---
+// 7. FUNÇÕES DE DELETAR (ADMIN)
 async function deletarAviso(id) {
     if (!confirm('Tem certeza que deseja deletar este aviso? Esta ação não pode ser desfeita.')) {
         return;
@@ -419,11 +415,158 @@ async function deletarAnuncio(id) {
         if (error) {
             throw error;
         }
-        // --- CORREÇÃO AQUI ---
-        // Deve chamar carregarAnuncios() e não carregarAvisos()
         carregarAnuncios();
     } catch (error) {
         console.error('Erro ao deletar anúncio:', error.message);
         showMessage('anuncio-error', 'Erro ao deletar: ' + error.message);
+    }
+}
+
+// --- NOVO: Deletar Feriado ---
+async function deletarFeriado(id) {
+    if (!confirm('Tem certeza que deseja deletar este feriado? Esta ação não pode ser desfeita.')) {
+        return;
+    }
+
+    try {
+        const { error } = await clienteSupabase
+            .from('feriados')
+            .delete()
+            .eq('id', id);
+
+        if (error) {
+            throw error;
+        }
+        carregarFeriados();
+    } catch (error) {
+        console.error('Erro ao deletar feriado:', error.message);
+        showMessage('feriado-error', 'Erro ao deletar: ' + error.message);
+    }
+}
+
+// --- 8. FUNÇÕES DO BANCO DE DADOS (AVALIAÇÕES) ---
+/**
+ * Carrega as avaliações da tabela 'avaliacoes'.
+ */
+async function carregarAvaliacoes() {
+    const isAdmin = document.getElementById('btn-postar-avaliacao') !== null;
+
+    const { data, error } = await clienteSupabase
+        .from('avaliacoes')
+        .select('*') 
+        .order('data_avaliacao', { ascending: true }); 
+
+    if (error) {
+        console.error('Erro ao carregar avaliações:', error.message);
+        showMessage('avaliacao-error', 'Erro ao carregar as avaliações. Tente recarregar a página.');
+        return;
+    }
+
+    const listaAvaliacoes = document.getElementById('lista-avaliacoes');
+    listaAvaliacoes.innerHTML = '';
+
+    if (data.length === 0) {
+        listaAvaliacoes.innerHTML = '<p>Nenhuma avaliação cadastrada ainda.</p>';
+        return;
+    }
+
+    data.forEach(avaliacao => {
+        const divAvaliacao = document.createElement('div');
+        divAvaliacao.classList.add('aviso'); 
+        
+        let deleteButtonHTML = '';
+        if (isAdmin) {
+            deleteButtonHTML = `<button class="btn-delete" onclick="deletarAvaliacao(${avaliacao.id})">Deletar</button>`;
+        }
+
+        const dataFormatada = new Date(avaliacao.data_avaliacao).toLocaleDateString('pt-BR', {
+            day: '2-digit',
+            month: '2-digit',
+            year: 'numeric',
+            timeZone: 'UTC' 
+        });
+
+        divAvaliacao.innerHTML = `
+            ${deleteButtonHTML}
+            <h3>${avaliacao.titulo} (${avaliacao.materia})</h3>
+            <p>Data: ${dataFormatada}</p>
+            <p>Detalhes: ${avaliacao.detalhes}</p> 
+        `;
+        listaAvaliacoes.appendChild(divAvaliacao);
+    });
+}
+
+/**
+ * Cria uma nova avaliação (somente admin).
+ */
+async function criarAvaliacao() {
+    hideMessage('avaliacao-error');
+    
+    const titulo = document.getElementById('avaliacao-titulo').value;
+    const materia = document.getElementById('avaliacao-materia').value;
+    const dataAvaliacao = document.getElementById('avaliacao-data').value;
+    const detalhes = document.getElementById('avaliacao-detalhes').value;
+
+    if (!titulo || !materia || !dataAvaliacao) {
+        showMessage('avaliacao-error', 'Por favor, preencha o título, a matéria e a data.');
+        return;
+    }
+
+    const { data: { user } } = await clienteSupabase.auth.getUser();
+
+    const { data, error } = await clienteSupabase
+        .from('avaliacoes')
+        .insert([
+            { 
+                titulo: titulo, 
+                materia: materia,
+                data_avaliacao: dataAvaliacao,
+                detalhes: detalhes, 
+                user_id: user.id 
+            } 
+        ]);
+
+    if (error) {
+        console.error('Erro ao criar avaliação:', error.message);
+        showMessage('avaliacao-error', 'Erro ao postar avaliação: ' + error.message);
+    } else {
+        console.log('Avaliação criada:', data);
+        showMessage('avaliacao-error', 'Avaliação postada com sucesso!', false);
+        
+        document.getElementById('avaliacao-titulo').value = '';
+        document.getElementById('avaliacao-materia').value = '';
+        document.getElementById('avaliacao-data').value = '';
+        document.getElementById('avaliacao-detalhes').value = '';
+        
+        carregarAvaliacoes(); 
+        setTimeout(() => { hideMessage('avaliacao-error'); }, 3000);
+    }
+}
+
+/**
+ * Deleta uma avaliação (somente admin).
+ * @param {number} id - O ID da avaliação a ser deletada.
+ */
+async function deletarAvaliacao(id) {
+    if (!confirm('Tem certeza que deseja deletar esta avaliação? Esta ação não pode ser desfeita.')) {
+        return;
+    }
+
+    try {
+        const { error } = await clienteSupabase
+            .from('avaliacoes')
+            .delete()
+            .eq('id', id);
+
+        if (error) {
+            throw error;
+        }
+
+        carregarAvaliacoes();
+        
+
+    } catch (error) {
+        console.error('Erro ao deletar avaliação:', error.message);
+        showMessage('avaliacao-error', 'Erro ao deletar: ' + error.message);
     }
 }
